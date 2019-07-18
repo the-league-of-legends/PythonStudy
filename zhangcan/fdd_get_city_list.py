@@ -12,9 +12,9 @@ print(r.text)  # 打印解码后的返回数据
 
 jsonStr = r.text
 jsonObject = json.loads(jsonStr)  # 将已经编码的Json串解码为python对象
-hotCityListObject = jsonObject["data"]["hotCityList"]
+hotCityListObject = jsonObject["data"]["hotCityList"]  # 方式1
 print(hotCityListObject)
-hotCityList02 = jsonObject.get("data").get("hotCityList")
+hotCityList02 = jsonObject.get("data").get("hotCityList")  # 方式2
 print(hotCityList02)
 
 for item in hotCityListObject:
