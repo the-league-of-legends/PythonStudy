@@ -9,6 +9,9 @@ city_name_list = get_city_name_list()
 
 for city_name in city_name_list:
     page_url_list = get_list_page_url(city_name)
+    if page_url_list is None:
+        continue
+
     time.sleep(1)
     for pageUrl in page_url_list:
         spider_detail(pageUrl)

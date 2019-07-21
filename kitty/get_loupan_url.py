@@ -18,7 +18,7 @@ def get_list_page_url(city_name):
                  AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
     try:
 
-        response = requests.get(start_url, headers=headers)
+        response = requests.get(start_url, headers=headers,timeout = 10)
         response_text = response.text
         # print(response_text)
         sel = etree.HTML(response_text)
@@ -55,7 +55,8 @@ def get_list_page_url(city_name):
         return page_url_list
 
     except Exception as ex:
-        logging.exception(ex)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~楼盘url获取异常 city_name:" + city_name)
+        # logging.exception(ex)
         print(ex)
 
 
@@ -64,9 +65,9 @@ def save_csv(error_list):
         with open("error_info.csv", \
                   "a", encoding="utf-8-sig", newline="")as f:
             writer = csv.writer(f, dialect="excel")
-
             writer.writerow(error_list)
     except Exception as ex:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~错误楼盘url信息 写入异常")
         logging.exception(ex)
         print(ex)
 
