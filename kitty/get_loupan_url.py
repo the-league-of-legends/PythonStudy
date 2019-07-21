@@ -6,9 +6,12 @@ import csv
 import logging
 from pyquery import PyQuery as pq
 
+from kitty.common_utils import save_csv
 from kitty.get_loupan_price import spider_detail
 
 """根据城市得到起始URL，并得到总套数，为分页做准备"""
+
+error_info_file_name = "get_page_url_list_error_info"
 
 
 def get_list_page_url(city_name):
@@ -18,7 +21,7 @@ def get_list_page_url(city_name):
                  AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
     try:
 
-        response = requests.get(start_url, headers=headers,timeout = 10)
+        response = requests.get(start_url, headers=headers, timeout=10)
         response_text = response.text
         # print(response_text)
         sel = etree.HTML(response_text)
@@ -31,7 +34,7 @@ def get_list_page_url(city_name):
             error_list = list();
             error_list.append("url:" + start_url)
             error_list.append("response:" + response_text)
-            save_csv(error_list)
+            save_csv(error_info_file_name, error_list)
             return
 
         if total_num % 20 == 0:
@@ -58,17 +61,3 @@ def get_list_page_url(city_name):
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~楼盘url获取异常 city_name:" + city_name)
         # logging.exception(ex)
         print(ex)
-
-
-def save_csv(error_list):
-    try:
-        with open("error_info.csv", \
-                  "a", encoding="utf-8-sig", newline="")as f:
-            writer = csv.writer(f, dialect="excel")
-            writer.writerow(error_list)
-    except Exception as ex:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~错误楼盘url信息 写入异常")
-        logging.exception(ex)
-        print(ex)
-
-# get_list_page_url("shenzhen")

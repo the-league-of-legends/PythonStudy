@@ -1,18 +1,18 @@
 # coding:utf-8
 import requests
 from lxml import etree
-import time
-import csv
-import logging
+
+from kitty.common_utils import save_csv
 
 """爬取目标网站"""
+file_name = "loupan_price_error_info"
 
 
 def spider(url):
     try:
         header = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) \
             AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
-        response = requests.get(url=url, headers=header,timeout = 10)
+        response = requests.get(url=url, headers=header, timeout=10)
         return response.text
     except Exception as ex:
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~有异常了")
@@ -26,7 +26,11 @@ def spider(url):
 def spider_detail(url):
     response_text = spider(url)
     if response_text is None:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~价格获取页面请求异常 url:"+url)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~价格获取页面请求异常 url:" + url)
+        get_price_fail_url_list = list()
+        get_price_fail_url_list.append("价格获取页面请求异常 url")
+        get_price_fail_url_list.append(url)
+        save_csv("get_price_fail_url_list", get_price_fail_url_list)
         return
     # print(response_text)
     sel = etree.HTML(response_text)
@@ -37,6 +41,12 @@ def spider_detail(url):
             total_price_eles = sel.xpath('%s/strong' % total_price_xpath_prefix)
             average_price_eles = sel.xpath(
                 '//*[@id="root"]/main/div[3]/div[1]/ul/li[%d]/div/div[2]/p[2]' % loupan_num)
+            loupan_name_eles = sel.xpath('//*[@id="root"]/main/div[3]/div[1]/ul/li[%d]/div/h4/a' % loupan_num)
+            loupan_name = '--'
+            if len(loupan_name_eles) > 0:
+                loupan_name = loupan_name_eles[0].text
+                print(loupan_name)
+
             loupan_total_price = '--'
             loupan_average_price = '--'
             if len(total_price_eles) > 0:
@@ -53,17 +63,20 @@ def spider_detail(url):
                     else:
                         print("未获取到均价 url:" + url)
             else:
-                print("当前楼盘暂无售价 url:" + url)
+                print("当前楼盘暂无售价 url:" + url + " 当前楼盘：" + loupan_name)
+                # print(response_text)
 
             print("均价：" + loupan_average_price + " 总价：" + loupan_total_price)
             average_price = change_to_int(loupan_average_price)
             total_price = change_to_int(loupan_total_price)
             if average_price != -1 and average_price <= 1000:
+                save_price_error_info("平均价格异常", url, average_price, total_price)
                 print("---------------------------->>>>>>>>>>>>>>平均价格异常 url:" + url + " average_price：" + str(
                     average_price))
 
             if total_price != -1 and total_price <= 10:
-                print("---------------------------->>>>>>>>>>>>>>总价格异常 url:" + url + " total_price：" + str(total_price))
+                save_price_error_info("总价异常", url, average_price, total_price)
+                print("---------------------------->>>>>>>>>>>>>>总价异常 url:" + url + " total_price：" + str(total_price))
     except Exception as ex:
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~解析dom树 有异常了")
         # logging.exception(ex)
@@ -78,20 +91,13 @@ def change_to_int(price):
         return -1
 
 
-"""将数据按行存储在csv文件中"""
+def save_price_error_info(tips, url, average_price, total_price):
+    info_list = list();
+    info_list.append(tips)
+    info_list.append(url)
+    info_list.append(average_price)
+    info_list.append(total_price)
+    save_csv(file_name, info_list);
 
 
-def save_csv(loupan_data):
-    try:
-        with open("loupan.csv", \
-                  "a", encoding="utf-8-sig", newline="")as f:
-            writer = csv.writer(f)
-
-            writer.writerow(loupan_data)
-    except Exception as ex:
-        logging.exception(ex)
-        print(ex)
-
-
-# save_csv(["loupan_average_price", "loupan_total_price"])
 spider_detail("https://baoding.fangdd.com/loupan/?pageNo=7")

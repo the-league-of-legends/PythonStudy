@@ -11,7 +11,7 @@ def get_city_name_list():
     try:
 
         city_name_list = list()
-        r = requests.get(url='https://suzhou.fangdd.com/component/api/data/fetchCityList', params={'baseUrl': '/loupan/'})
+        r = requests.get(url='https://suzhou.fangdd.com/component/api/data/fetchCityList', params={'baseUrl': '/loupan/'},timeout =10)
         r.encoding = 'utf-8'  # 得到的结果转换为编码
         jsonStr = r.text
         jsonObject = json.loads(jsonStr)  # 将已经编码的Json串解码为python对象
