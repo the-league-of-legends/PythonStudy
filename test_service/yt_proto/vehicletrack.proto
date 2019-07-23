@@ -1,0 +1,1924 @@
+package proto;   
+  
+option java_package = "iov.dc.taurus.proto";   
+option java_outer_classname = "VehicleTrackBean";   
+  
+message GPSInfo{   
+    optional int32 gps_valid =1;   
+    optional double gps_latitude = 2;
+    optional double gps_longitude = 3;
+    optional double gps_speed = 4;
+    optional double gps_direction = 5;
+    optional double gps_altitude = 6;
+    optional int32 gps_state = 7;
+    optional string timestamp = 8;
+    optional string utc_timestamp = 9;
+
+}
+
+message DoorInfo{   
+    optional int32 door1 = 1;   
+    optional int32 door2 = 2;
+    optional int32 door3 = 3;
+    optional int32 door4 = 4;
+    optional int32 door5 = 5;
+    optional int32 door6 = 6;
+    optional int32 door_open_illegal = 7;
+    optional int32 door_open_abnormal = 8;
+    optional int32 door_open_in_area = 9;
+    optional int32 door_open_out_area = 10;
+    optional int32 door_open_when_stop = 11;
+    optional int32 door_open_when_running = 12;
+    
+    optional int32 f_door = 13;
+    optional int32 m_door = 14;
+    optional int32 b_door = 15;
+    
+    
+    optional string timestamp = 16;
+    optional string utc_timestamp = 17;
+    
+    optional int32 door_lock = 18;
+}
+
+message PowerInfo{   
+    optional float ext_vol = 1;
+    optional int32 sly_elec_state = 2;
+    optional float battery_vol = 3;
+    optional double i_fuel_cons = 4;
+    optional double i_gas_cons = 5;
+    optional double i_e_cons = 6;
+    optional float fuel_level = 7;
+    optional double fuel_vol = 8;
+    optional double meter_fuel_cons = 9;
+    optional double battery_soc = 10;
+    optional double bty_t_vol = 11;
+    optional double p_t_p = 12;
+    optional double r_t_p = 13;
+    optional int32 bty_s_i_irst = 14;
+    optional double cap_sys_vol_diff = 15;
+    optional int32 bty_h_vol_pos_is_irst = 16;
+    optional int32 bty_h_vol_neg_is_irst = 17;
+    optional double qck_chg_bty_soc = 18;
+    optional int32 bty_mod_num = 19;
+    optional int32 bty_pack_mod_num_num = 20;
+    optional int32 st_byt_mod_num1 = 21;
+    optional int32 st_byt_mod_num2 = 22;
+    optional double bms_pro_v_info = 23;
+    optional double mod_tot_vol = 24;
+    optional double sig_max_vol = 25;
+    optional double sig_min_vol = 26;
+	optional double sig_max_temp = 27;
+	optional double sig_min_temp = 28;
+	optional int32 sig_max_vol_num = 29;
+	optional int32 sig_min_vol_num = 30;
+	optional int32 sig_max_temp_num = 31;
+	optional int32 sig_min_temp_num = 32;
+	
+	optional int32 total_chrg_time = 33;
+	optional double output_engy = 34;
+	optional int32 chrgr_num = 35;
+	optional double charger_out_voltage = 36;
+	
+	optional double df_t_e_c = 37;
+    optional double ds_t_e_c = 38;
+    optional double ac_t_e_c = 39;
+    optional double acs_t_e_c = 40;
+    optional double e_h_t_e_c = 41;
+    optional double e_hs_t_e_c = 42;
+    optional double m_m_t_e_c = 43;
+    optional double m_ms_t_e_c = 44;
+    optional double ss_t_e_c = 45;
+    optional double sss_t_e_c = 46;
+    optional double air_c_t_e_c = 47;
+    optional double airs_c_t_e_c = 48;
+    optional double dcdc_t_e_c = 49;
+    optional double dcdcs_t_e_c = 50;
+    optional double su_ca_soc = 51; 
+    optional double s_b_max_v = 52; 
+    optional double s_b_min_v = 53; 
+    optional double dd_fuel_level = 54; 
+
+    optional int32 min_v_e_core_num = 55;
+    optional int32 max_v_e_core_num = 56;
+    optional int32 s_b_max_t = 57;
+    optional int32 s_b_min_t = 58;
+    optional int32 max_t_s_b_num = 59;
+    optional int32 min_t_s_b_num = 60;
+    optional int32 ch_curr_limit = 61;
+    optional int32 dis_ch_curr_limit = 62;
+    optional double qck_ch_b_t_vol = 63;
+    optional double qck_ch_b_t_curr = 64;
+    optional double bty_asp_curr = 65;
+    optional double bty_asp_vol = 66;
+    optional double ch_pg_co_state = 67;
+    
+    optional double bty_t_curr = 68;
+    optional double sys_vol_diff = 69;
+    
+    
+    optional double charger_out_curr = 70;
+    optional double charger_temper = 71;
+    optional int32 once_char_ele_qty = 72;
+    optional double gas_consumption_wc = 73;
+    optional double gas_consumption_esi = 74;
+    optional double gas_consumption_eci = 75;
+    
+    optional string timestamp = 76;
+    optional string utc_timestamp = 77;
+    
+    optional float bty_sys_rated_capacity = 78;
+    optional float bty_sys_rated_consumption = 79;
+	
+	optional float pos_df_t_e_c = 80;
+	optional float rev_df_t_e_c = 81;
+	optional float pos_ds_t_e_c = 82;
+	optional float rev_ds_t_e_c = 83;
+	optional float pos_ac_t_e_c = 84;
+	optional float rev_ac_t_e_c = 85;
+	optional float pos_acs_t_e_c = 86;
+	optional float rev_acs_t_e_c = 87;
+	optional float pos_e_h_t_e_c = 88;
+	optional float rev_e_h_t_e_c = 89;
+	optional float pos_e_hs_t_e_c = 90;
+	optional float rev_e_hs_t_e_c = 91;
+	optional float pos_m_m_t_e_c = 92;
+	optional float rev_m_m_t_e_c = 93;
+	optional float pos_m_ms_t_e_c = 94;
+	optional float rev_m_ms_t_e_c = 95;
+	optional float pos_ss_t_e_c = 96;
+	optional float rev_ss_t_e_c = 97;
+	optional float pos_sss_t_e_c = 98;
+	optional float rev_sss_t_e_c = 99;
+	optional float pos_air_c_t_e_c = 100;
+	optional float rev_air_c_t_e_c = 101;
+	optional float pos_airs_c_t_e_c = 102;
+	optional float rev_airs_c_t_e_c = 103;
+	optional float pos_dcdc_t_e_c = 104;
+	optional float rev_dcdc_t_e_c = 105;
+	optional float pos_dcdcs_t_e_c = 106;
+	optional float rev_dcdcs_t_e_c = 107;
+	
+	optional float pos_m_m_t_e_con_2 = 108;
+	optional float rev_m_m_t_e_con_2 = 109;
+	optional float pos_m_m_s_e_con_2 = 110;
+	optional float rev_m_m_s_e_con_2 = 111;
+	optional float pos_m_m_t_e_con_3 = 112;
+	optional float rev_m_m_t_e_con_3 = 113;
+	optional float pos_m_m_s_e_con_3 = 114;
+	optional float rev_m_m_s_e_con_3 = 115;
+	optional float pos_m_m_t_e_con_4 = 116;
+	optional float rev_m_m_t_e_con_4 = 117;
+	optional float pos_m_m_s_e_con_4 = 118;
+	optional float rev_m_m_s_e_con_4 = 119;
+	
+	optional float m_m_t_e_con_2 = 120;
+	optional float m_m_t_e_con_3 = 121;
+	optional float m_m_t_e_con_4 = 122;
+	
+	optional double revise_battery_soc = 123;
+	
+	optional float the_post_total_power = 124;
+	optional float the_revr_total_power = 125;
+	
+	optional float revise_r_t_p = 126;
+	optional float revise_p_t_p = 127;
+	
+	optional float storage_bty_current = 128;
+	optional float storage_bty_voltage = 129;
+	optional float mid_voltage = 130;
+	optional float sensor_temp = 131;
+	optional int32 current_measure_range = 132;
+	optional float storage_bty_soc = 133;
+	optional int32 soc_max_rolerance = 134;
+	optional int32 soc_min_rolerance = 135;
+	optional int32 bty_temp = 136;
+	
+	optional string soc_adjust = 137;
+	optional string dischrg_end = 138;
+	optional string chrg_state = 139;
+	optional string external_chrg_detect = 140;
+	optional string request_bty_param = 141;
+	optional string ibs_error = 142;
+	optional string lin_resp_error = 143;
+	
+	optional float bty_health_degree = 144;
+	optional float max_capacity_lose = 145;
+	optional float min_capacity_lose = 146;
+	optional int32 mid_capacity_diff = 147;
+	optional string bty_sulfation_etect = 148;
+	optional string bty_defect_detect = 149;
+	optional float storage_bty_resist = 150;
+	optional int32 current_sig_strength = 151;
+	optional float current_ave_sig_strength = 152;
+	optional float bty_factory_sig_strength = 153;
+	optional float bty_ave_sig_strength = 154;
+	optional float bty_sig_strength_and_ave_sum = 155;
+	
+	optional float revise_i_fuel_cons = 156;
+	optional float revise_gas_consumption_wc = 157;
+	optional double revise_gas_consumption_esi = 158;
+	optional double revise_gas_consumption_eci = 159;
+
+    optional int32 car_hg_mode = 160 ;
+
+    optional int32 hg_ry_ss = 161 ;
+
+    optional int32 max_ve_ce_nr = 162 ;
+
+    optional int32 min_ve_ce_nr = 163 ;
+
+    optional int32 pl_vn_flg = 164 ;
+
+    optional float dt_c2 = 165;
+    optional float dc_ot_v2 = 166;
+    optional int32 dcdc_t2 = 167;
+    optional float se_bl = 168;
+    optional float tl_fe_ct = 169;
+    optional int32 ss_hn_cn = 170;
+    optional float hn_fl_cn_re = 171;
+    optional int32 hn_ve_cl_rt = 172;
+    optional float se_hn_cn = 173;
+    optional int32 be_cr_ss = 174;
+    optional int32 dk_s2 = 175;
+	optional float sgl_bty_ave_voltage = 176;
+
+	optional int32 pst_eec_mtr_ttl_eec_cmn = 177;
+    optional int32 rvr_eec_mtr_ttl_eec_cmn = 178;
+
+    optional double new_once_char_ele_qty = 179;
+
+    optional double fuson_rate=180;
+
+    optional int32 high_votge_main_relay_state = 181;
+
+    optional double eltic_hetng_revr_total_poe51 = 182;
+    optional double eltic_hetng_post_total_poe51 = 183;
+    optional double eltic_hetng_the_revr_total_poe51 = 184;
+    optional double eltic_hetng_the_post_total_poe51 = 185;
+}
+
+message StateInfo{   
+    optional int32 start_signal =1;   
+    optional int32 danger_signal = 2;
+    optional int32 e_hatch = 3;
+    optional int32 on_gear = 4;
+    optional int32 wiper = 5;
+    optional int32 explosive_fire_ex = 6;
+    optional int32 gearbox = 7;
+    optional int32 clutch_signal = 8;
+    optional int32 brake_signal = 9;
+    optional int32 retarder = 10;
+    optional int32 hand_brake = 11;
+    optional int32 power_e_fan_cont = 12;
+    optional int32 e_clutch_fan_gear = 13;
+    optional int32 rssi_2g = 14;
+    optional int32 rssi_wireless = 15;
+    optional int32 rssi_3g = 16;
+    optional int32 gnss_stat_count = 17;
+    
+    optional string device_state = 18;
+    optional string vehicle_lock_state = 19;
+    optional string io_state = 20;
+    optional string v_state_info = 21;
+    optional string v_state_info_ext = 22;
+    
+    
+    optional int32 heater_state =23;   
+    optional int32 clutch = 24;
+    optional int32 byt_ma_sys_state = 25;
+    optional int32 cap_ma_sys_state = 26;
+    optional int32 eng_ha_ex = 27;
+    optional int32 vehicle_state = 28;
+    optional int32 on_gear_ex = 29;
+    optional int32 start_sig_ex = 30;
+    optional int32 f_dri_sig = 31;
+    optional int32 emer_swi = 32;
+    optional int32 ma_mot_rot_direc = 33;
+    optional int32 ma_mo_ct_mod = 34;
+    optional int32 bw_dc_work_state = 35;
+    
+    optional int32 hand_br_ex = 36;
+    optional int32 bra_state = 37;
+    optional int32 m_m_w_m = 38;
+    optional int32 gear_info = 39;
+    optional int32 b_l_s = 40;
+    
+    optional int32 acs = 41;
+    
+    
+    optional int32 mot_cl_down_odr = 42;
+    optional int32 is_ldcd_w_m =43;   
+    optional int32 ex_ch_mod = 44;
+    optional int32 mot_ctl_mod = 45;
+    optional int32 bak_sta_sig = 46;
+    optional int32 bak_cl_down_sig = 47;
+    optional int32 ac_p_eff_sig = 48;
+    optional int32 isg_mo_ctl_mod = 49;
+    optional int32 bth_dcdc_chg_w_s = 50;
+    optional int32 ele_fan_w_m = 51;
+    optional int32 ac_sys_sw = 52;
+    optional int32 idle_st_sig = 53;
+    
+    
+    optional int32 ac_comp_sw = 54;
+    optional int32 ac_eheater_sw = 55;
+    optional int32 ac_cooling_sw = 56;
+    optional int32 ac_heat_sw = 57;
+    
+    optional int32 speak_ss = 58;
+    
+    
+    optional string timestamp = 59;
+    optional string utc_timestamp = 60;
+    
+	optional int32 net_aux_r_s = 61;
+    optional int32 tr_ol_a = 62;
+    optional int32 ac_s_s = 63;
+    optional int32 isl_dc_lv_ena = 64;
+    optional int32 sp_c_lv_ena = 65;
+    optional int32 isl_dc_p_p = 66;
+    optional int32 char_ctr_b = 67;
+    optional int32 isl_dc_req_wm = 68;
+    optional int32 tro_s_s = 69;
+    optional int32 isl_dc_f_l = 70;
+    optional int32 isl_dc_f_c = 71;
+    optional int32 tr_lif_ctr = 72;
+    
+    optional int32 b_e_ala_fg=73;
+    optional int32 l_soc_st_fg=74;
+    optional int32 h_t_fg=75;
+    optional int32 o_c_fg=76;
+    optional int32 l_soc_fg=77;
+    optional int32 h_soc_fg=78;
+    optional int32 s_b_v_l_fg=79;
+    optional int32 s_b_v_h_fg=80;
+    optional int32 ac_vent_s = 81;
+    optional int32 ac_auto_s = 82;
+    
+    optional int32 revise_vehicle_state = 83;
+    optional int32 revise_m_m_w_m = 84;
+
+    optional int32 rear_axle_pe_sr = 85;
+    optional int32 ft_axle_pe_sr = 86;
+    optional int32 asr_ec_sd_ve_ce = 87;
+    optional int32 abs_ec_sd_ve_open = 88;
+    optional int32 abs_ec_sd_ve_ce = 89;
+    optional int32 lgear_work_ss = 90;
+    optional int32 ec_pg_cn = 91;
+    optional int32 ramp_ay_sg_se = 92;
+    optional int32 lgear_bt_se = 93;
+    optional int32 hold_fn = 94;
+    optional int32 ramp_ay_sg_asr_ct = 95;
+    optional int32 ec_pg_asr_ct = 96;
+    optional int32 abs_ec_sd_ve_open_ct = 97;
+    optional int32 abs_ec_sd_ve_ce_ct = 98;
+
+    optional int32 cmcs_value = 99;
+    optional int32 coion_wanng_level = 100;
+    optional int32 cmcs_swtch_state = 101;
+    optional double front_obale_retve_laeal_diace = 102;
+    optional double front_obale_retve_speed = 103;
+    optional double front_obale_retve_long_diace = 104;
+    optional int32 obale_type = 105;
+    optional double strng_angle = 106;
+    optional int32 xbr_sytem_state = 107;
+    optional double brake_deron = 108;
+    optional int32 hyeon_hatch_state = 109;
+
+    optional double ac_total_power = 110;
+
+    optional int32 buzer_early_wanng = 111;
+    optional int32 steng_wheel_viaor_wanng = 112;
+    optional int32 stop_brkng_futon_order = 113;
+    optional int32 door_brkng_work_mode = 114;
+    optional int32 ebs_red_light_fault = 115;
+    optional int32 ebs_yelow_light_fault = 116;
+    optional int32 ebs_brake_swtch = 117;
+    optional double ebs_brake_deree = 118;
+    optional int32 ebsabs_acvte_sinal = 119;
+
+
+    optional int32 ac_prsre_swtch = 120;
+    optional double ac_evap_fan_speed_pecnt = 121;
+    optional double ac_cond_fan_speed_pecnt = 122;
+    optional double ac_input_bus_vol = 123;
+
+
+    optional double left_front_brake_air_prsre = 124;
+    optional double right_front_brake_air_prsre = 125;
+    optional double left_rear_brake_air_prsre = 126;
+    optional double right_rear_brake_air_prsre = 127;
+    optional double ebs_elc_toque_pecnt = 128;
+    optional double veile_elc_brake_max_ablty_pecnt = 129;
+    optional double veile_out_elc_toque_pecnt = 130;
+    optional int32 ebs_drive_toque_mode = 131;
+    optional double ebs_out_drive_toque_pecnt = 132;
+
+    optional int32 ac_evror_fan_gear = 133;
+    optional int32 derst_air_out_mode_and_ciute_cotol = 134;
+    optional int32 derst_ptc_gear_cotol = 135;
+    optional double derst_evap_temp = 136;
+    optional double derst_coeor_acual_speed = 137;
+    optional double derst_ac_total_power = 138;
+    optional int32 ptc_heter_cotol = 139;
+    optional int32 chrg_stte2 = 140;
+    optional int32 high_vol_reust = 141;
+    optional int32 bms_req_setng_mode = 142;
+    optional double bms_curnt_vol = 143;
+    optional double bms_water_temp = 144;
+    optional int32 bms_heat_maage_relay_state = 145;
+	
+	
+    optional double  inst_power_comon= 146; 
+    optional double  enrce_miege= 147; 
+    optional double  bty_seius_high_tmpt_box_nuber= 148;
+    optional double  bty_tmpt_feler_cnt= 149; 
+    optional double  bty_mooer_cnt= 150; 
+    optional double  bty_cacty_soh= 151; 
+    
+    optional uint32  bms_prang_swtch= 152; 
+    optional uint32  bms_prang_type= 153;           
+    optional string  bms_prang_time= 154; 
+    
+    optional double  left_front_brake_gaket_info= 155;
+    optional double  right_front_brake_gaket_info= 156; 
+    optional double  left_back_brake_gaket_info= 157; 
+    optional double  right_back_brake_gaket_info= 158; 
+    optional uint32  tyre_fast_leak_alarm= 159; 
+    optional uint32  tyre_high_tmp_alarm= 160;   
+    optional uint32  tyre_sesor_elc_qutty_state= 161; 
+}
+
+message MainMotorTotalInfo{
+	optional int32 dc_sta=1;
+    optional int32 g_a_32960=2;
+	repeated MainMotorInfo m_m_Info_list=3;
+}
+
+message MainMotorInfo{
+	optional int32 m_m_w_m=1;
+    optional int32 m_m_ctr_tem=2;
+	optional float m_m_tach=3;
+	optional int32 m_m_inst_out_tor=4;
+	optional float m_m_temper=5;
+	optional int32 m_m_ctr_bus_vol=6;
+	optional int32 m_m_ctr_bus_cur=7;
+}
+
+message TerminalInfo{
+    optional int32 new_engy_dev_addr = 1;
+    optional int32 nedsfm = 2;
+    optional int32 nedsfd = 3;
+    optional int32 nedsfy = 4;
+    optional int32 neds_main_ver = 5;
+    optional int32 neds_sub_hver = 6;
+    optional int32 neds_sub_lver = 7;
+    optional int32 nedh_main_ver = 8;
+    optional int32 nedh_sub_hver = 9;
+    optional int32 nedh_sub_lver = 10;
+    optional int32 prog_code = 11;
+    
+    optional string timestamp = 12;
+    optional string utc_timestamp = 13;
+}
+
+message LightInfo{   
+    optional int32 fog_light = 1;   
+    optional int32 front_fog_light = 2;
+    optional int32 back_fog_light = 3;
+    optional int32 high_beam_light = 4;
+    optional int32 low_beam_light = 5;
+    optional int32 turn_left_light = 6;
+    optional int32 turn_right_light = 7;
+    optional int32 reversing_light = 8;
+    optional int32 braking_light = 9;
+    optional int32 position_light = 10;
+    optional int32 sigh_light = 11;
+    optional int32 clearance_light = 12;
+    optional int32 fault_light = 13;
+    
+    optional int32 ri_str_lamp_ex = 14;
+    optional int32 le_str_lamp_ex = 15;
+    optional int32 high_b_ex = 16;
+    optional int32 dip_head_li_ex = 17;
+    optional int32 back_fo_lam_ex = 18;
+    
+    optional int32 l_read_lamp = 19;
+    optional int32 r_read_lamp = 20;
+    optional int32 front_fog_lamp = 21;
+    optional int32 back_fog_lamp = 22;
+    optional int32 pos_lamp = 23;
+    optional int32 dbl_f_lamp = 24;
+    
+    optional string timestamp = 25;
+    optional string utc_timestamp = 26;
+}
+
+message ConditionDataInfo{   
+    optional double e_oil_press =1;   
+    optional double e_oil_temper = 2;
+    optional double e_cool_water_temper = 3;
+    optional int32 m_motor_ctrl_bus_cur = 4;
+    optional int32 m_motor_ctrl_bus_vol = 5;
+    optional double m_motor_temper = 6;
+    optional float m_motor_rotate = 7;
+    optional double e_rotate_spd = 8;
+    optional double barometric_press = 9;
+    optional double barometric_temper = 10;
+    optional double e_inlet_temper = 11;
+    optional double intake_manifold_press = 12;
+    optional double intake_manifold_temper = 13;
+    optional double inlet_press = 14;
+    optional double drive_req_torque = 15;
+    optional double e_actual_torque = 16;
+    optional double e_req_torque = 17;
+    optional int32 rotate_spd_load_per = 18;
+    optional double friction_torque_per = 19;
+    optional double e_acc_run_time = 20;
+    optional double e_acc_run_rpm = 21;
+    optional int32 e_fuel_temper = 22;
+    
+    optional double acc_pedal_pos =23;   
+    optional int32 urea_level = 24;
+    optional double brake_air1_press = 25;
+    optional double brake_air2_press = 26;
+    optional int32 wiper_gear = 27;
+    optional int32 char_coefficient_state = 28;
+    optional double vss_mileage = 29;
+    
+    optional double inside_temper = 30;   
+    optional double outside_temper = 31;
+    optional double power_supply_vol = 32;
+    
+    
+    optional double s_cap_max_t = 33;
+    optional double s_cap_min_t = 34;
+    optional int32 max_t_s_cap_num = 35;
+    optional int32 min_t_s_cap_num = 36;
+    optional int32 cap_s_o_vol_alm_m_num = 37;
+    optional int32 f_272829_m_num = 38;
+    
+    
+    optional int32 cnt_c = 39;
+    optional int32 isg_mcbv = 40;
+    optional int32 bbap = 41;
+    optional int32 fbap = 42;
+    optional double sess = 43;
+    optional double psv24 = 44;
+    optional int32 isgmcait = 45;
+    optional int32 mmcait = 46;
+    optional double mtisg = 47;
+    optional int32 isgmcbc = 48;
+    
+    optional int32 eng_run_time = 49;
+    optional double t_gas_cons = 50;
+    optional double c_sp_l_per = 51;
+    optional int32 eng_volo = 52;
+    optional int32 dr_or_tor_per = 53;
+    optional int32 eng_wa_temp = 54;
+    optional int32 mmiot = 55;
+    optional int32 mmct = 56;
+    
+    optional double met_spd = 57;
+    optional int32 isg_mo_temp = 58;
+    optional int32 cnl_un_spd = 59;
+    
+    
+    optional double apapl = 60;
+   	optional double pdapl = 61;
+    optional int32 acc_p_vol = 62;
+    optional int32 br_p_vol = 63;
+    optional double mmoaape = 64;
+    optional int32 ma_m_t_t = 65;
+    optional double main_m_t_r_s = 66;
+    optional int32 m_tar_t = 68;
+    optional double m_tar_r_s = 69;
+    optional int32 m_acc_out = 70;
+    optional int32 isg_m_t_t = 71;
+    optional float isg_m_t_r_s = 72;
+    optional int32 isg_m_in_out = 73;
+    optional float isg_m_in_r_s = 74;
+    optional int32 isg_m_w_mode = 75;
+    optional int32 isg_mo_ra_di = 76;
+    optional int32 mid_br_air_press = 77;
+    
+    
+    optional float ac_o_c = 78;
+    optional int32 ac_c_a_s = 79;
+    optional int32 ac_o_temp = 80;
+    
+    
+    optional int32 ac_pan_set_temp = 81;
+    optional int32 ac_pan_set_temp2 = 82;
+    optional int32 ice_snow_mode = 83;
+    optional int32 ele_re_fr_sig = 84;
+    
+    optional float acc_ro_ra = 85;
+    optional int32 ac_p_set_tem = 86;
+    optional int32 in_veh_temp = 87;
+    optional int32 out_veh_temp = 88;
+    optional int32 ac_eva_temp = 89;
+    optional int32 ac_con_temp = 90;
+    
+    optional double gas_cons = 91;
+    optional double m_t_oil_cons = 92;
+    
+    optional int32 ac_w_m = 93;
+    optional int32 ac_c_g = 94;
+    optional int32 ac_fw_state = 95;
+    optional int32 ac_w_g = 96;
+    optional double ac_water_temper = 97;
+    optional int32 r_temper_alm = 98;
+    optional int32 r_w_s = 99;
+    optional double s_c_t_current = 100;
+    
+    optional double catalyst_level_alti = 101;
+    optional double dcdc_out_current = 102;
+    optional double bothway_dcdc_in_power = 103;
+    optional double bothway_dcdc_out_voltage = 104;
+    optional int32 isl_dcdc_in_voltage = 105;
+    optional int32 isl_dcdc_tempt = 106;
+    optional float isl_dcdc_out_current = 107;
+    optional double isl_dcdc_actl_out_power = 108;
+    optional double isl_dcdc_fwd_total_elec_qty = 109;
+    optional double isl_dcdc_once_disch_elec_qty = 110;
+    optional float smc_out_voltage = 111;
+    optional float smc_out_current = 112;
+    optional double sgl_cap_max_volt = 113;
+    optional double sgl_cap_min_volt = 114;
+    optional double sgl_cap_avg_volt = 115;
+    optional int32 cap_max_volt_elec_core_num = 116;
+    optional int32 cap_min_volt_elec_core_num = 117;
+    optional int32 capSys_isl_rst = 118;
+    optional int32 cap_high_vol_posi_isl_rst = 119;
+    optional int32 cap_high_vol_nega_isl_rst = 120;
+    optional double total_vol = 121;
+    
+    optional double realtime_temp = 122;
+    
+    optional double sin_mil = 123;
+    optional float dcdc_o_v = 124;
+    optional float ac_o_volt = 125;
+    optional int32 h_signal = 126;
+    optional float driver_a_ac = 127;
+    optional int32 cur_res = 128;
+    optional int32 coll_a = 129;
+    optional int32 w_c_state = 130;
+    optional int32 o_w_tmp = 131;
+    optional int32 r_w_tmp = 132;
+    
+    optional string timestamp = 133;
+    optional string utc_timestamp = 134;
+    optional float isg_motor_t_e_qty=135;
+    optional int32 c_s_t_f_p=136;
+    optional int32 c_s_t_f_n=137;
+    optional int32 c_s_t_s_p=138;
+    optional int32 c_s_t_s_n=139;
+    
+    
+    optional float bms_ctr_char_c=140;
+    optional int32 lim_cur=141;
+    optional int32 v_req_cur=142;
+    optional int32 lim_cur_rec=143;
+    optional int32 v_act_cur=144;
+    optional float v_req_p=145;
+    optional float isl_dc_res_req_p=146;
+    optional int32 isl_dc_o_val=147;
+    
+    
+    optional int32 b_v_fg=148;
+    optional int32 b_c_fg=149;
+    optional float b_soc_fg=150;
+    optional float soh_fg=151;
+    optional float max_s_v_fg=152;
+    optional int32 max_s_v_bgn_fg=153;
+    optional float min_s_v_fg=154;
+    optional int32 min_s_v_bgn_fg=155;
+    optional int32 max_bg_t_fg=156;
+    optional int32 max_t_bgn_fg=157;
+    optional int32 fan_r_s_fg=158;
+    optional int32 ala_s_fg=159;
+    optional int32 ctt_ctr_fg=160;
+    optional int32 battery_manufacturer = 161;
+    optional int32 battery_type = 162;
+	
+	optional int32 isl_dc_req_wm_sh = 163;
+	optional int32 is_ldcd_w_m_sh = 164;
+	optional int32 isl_dcdc_in_vol_sh = 165;
+	optional float isl_dc_res_req_p_sh = 166;
+	optional int32 isl_dc_temp_sh = 167;
+	optional int32 isl_dcdc_out_vol_sh = 168;
+	optional float isl_dcdc_out_cur_sh = 169;
+	optional float isl_dcdc_actl_out_pow_sh = 170;
+	optional int32 isl_dc_f_l_sh = 171;
+	optional int32 isl_dc_f_c_sh = 172;
+	optional float m_m2_oaape = 173;
+	optional int32 m_m2_ctrl_bus_vol = 174;
+	optional int32 m_m2_wm = 175;
+	optional int32 m_m2_ra_di = 176;
+	optional int32 m_m2_cm = 177;
+	optional int32 m_m2_temp = 178;
+	optional int32 m_m2_ct = 179;
+	optional int32 pow_vo_1_8 = 180;
+	optional int32 pow_vo_8_16 = 181;
+	optional int32 pow_vo_17_24 = 182;
+	optional int32 pow_vo_25_32 = 183;
+	optional float m_m3_t_r_s = 184;
+	optional int32 m_m3_t_t = 185;
+	optional float m_m3_oaape = 186;
+	optional int32 m_m3_wm = 187;
+	optional int32 m_m3_ra_di = 188;
+	optional int32 m_m3_cm = 189;
+	optional int32 m_m3_o_t_t = 190;
+	optional float m_m3_o_t_r_s = 191;
+	optional int32 m_m3_temp = 192;
+	optional int32 m_m3_ct = 193;
+	optional int32 m_m3_ctrl_bus_cur = 194;
+	optional int32 m_m3_ctrl_bus_vol = 195;
+	optional int32 m_m3_cart = 196;
+	optional float m_m4_t_r_s = 197;
+	optional int32 m_m4_t_t = 198;
+	optional float m_m4_oaape = 199;
+	optional int32 m_m4_wm = 200;
+	optional int32 m_m4_ra_di = 201;
+	optional int32 m_m4_cm = 202;
+	optional int32 m_m4_o_t_t = 203;
+	optional float m_m4_o_t_r_s = 204;
+	optional int32 m_m4_temp = 205;
+	optional int32 m_m4_ct = 206;
+	optional int32 m_m4_ctrl_bus_cur = 207;
+	optional int32 m_m4_ctrl_bus_vol = 208;
+	optional int32 m_m4_cart = 209;
+	optional int32 interior_light = 210;
+	optional int32 et_b_v = 211;
+	optional int32 et_soc = 212;
+	optional int32 et_b_c = 213;
+	optional int32 et_m_r_s = 214;
+	optional int32 et_b_t = 215;
+	optional int32 et_m_c_t = 216;
+	optional int32 et_b_ot_a = 217;
+	optional int32 et_i_r_l_a = 218;
+	optional int32 et_b_ov_a1 = 219;
+	optional int32 et_b_ov_a2 = 220;
+	optional int32 et_m_ot_a = 221;
+	optional int32 et_h_s = 222;
+	optional int32 et_12b_lv_a = 223;
+	optional int32 et_pec_h_e = 224;
+	optional float et_o_s_s = 225;
+	optional int32 et_c_g_c = 226;
+	optional int32 et_h_b = 227;
+	optional int32 et_b_b = 228;
+	optional double et_v_s = 229;
+	optional int32 m_m2_ctrl_bus_cur_283 = 230;
+   	optional int32 m_m2_ctrl_act_rec_Tor_283 = 231;
+   	optional float apapt = 232;
+   	optional float bpapt = 233;
+	
+	optional float bms_ctrl_c_volt = 234;
+	optional float m_m2_tac = 235;
+	optional int32 m_m2_inst_o_t = 236;
+	optional int32 bms_c_mode = 237;
+	optional int32 dc_dc_tempt_24v = 238;
+	
+	optional int32 con_system_hitch = 239;
+	
+	optional double revise_m_t_oil_cons = 240;
+	
+	optional int32 npc_itype_jyd = 241;
+	optional int32 data_length_jyd = 242;
+	optional int32 replay_result_jyd = 243;
+	optional int32 order_parameter_jyd = 244;
+	optional int32 dtc_fault_code_jyd = 245;
+	optional int32 elect_fan_sys_fault_code_module1 = 246;
+	optional int32 elect_fan_sys_mode_module1 = 247;
+	optional int32 elect_fan1_fault_state_module1 = 248;
+	optional int32 elect_fan2_fault_state_module1 = 249;
+	optional int32 elect_fan3_fault_state_module1 = 250;
+	optional int32 elect_fan4_fault_state_module1 = 251;
+	optional int32 elect_fan5_fault_state_module1 = 252;
+	optional int32 elect_fan6_fault_state_module1 = 253;
+	optional int32 elect_fan_sys_fault_code_module2 = 254;
+	optional int32 elect_fan_sys_mode_module2 = 255;
+	optional int32 elect_fan1_fault_state_module2 = 256;
+	optional int32 elect_fan2_fault_state_module2 = 257;
+	optional int32 elect_fan3_fault_state_module2 = 258;
+	optional int32 elect_fan4_fault_state_module2 = 259;
+	optional int32 elect_fan5_fault_state_module2 = 260;
+	optional int32 elect_fan6_fault_state_module2 = 261;
+	
+	optional int32 elect_fan_no_brush_amount = 262;
+	optional int32 elect_fan_no_brush_system_fault_code = 263;
+	optional int32 elect_fan_no_brush_inter_cool_amount = 264;
+	optional int32 elect_fan_no_brush_water_temp_amount = 265;
+	optional int32 elect_fan_no_brush_sys_mode_module = 266;
+	optional int32 elect_fan1_no_brush_fault_state = 267;
+	optional int32 elect_fan2_no_brush_fault_state = 268;
+	optional int32 elect_fan3_no_brush_fault_state = 269;
+	optional int32 elect_fan4_no_brush_fault_state = 270;
+	optional int32 elect_fan5_no_brush_fault_state = 271;
+	optional int32 elect_fan6_no_brush_fault_state = 272;
+	optional int32 elect_fan7_no_brush_fault_state = 273;
+	optional int32 elect_fan8_no_brush_fault_state = 274;
+	optional int32 elect_fan9_no_brush_fault_state = 275;
+	optional int32 elect_fan10_no_brush_fault_state = 276;
+	optional int32 elect_fan11_no_brush_fault_state = 277;
+	optional int32 elect_fan12_no_brush_fault_state = 278;
+	
+	optional int32 heater_water_light_state = 279;
+	optional int32 heater_water_main_engine_light_state = 280;
+	optional string abs_dtc_fault_code1 = 281;
+	optional int32 abs_package_no = 282;
+	optional string abs_dtc_fault_code2 = 283;
+	optional int32 ac_fault_info = 284;
+	
+	optional float revise_t_gas_cons = 285;
+	optional float revise_isl_dcdc_once_disch_elec_qty = 286;
+
+	optional int32 ac_feh_air_sth = 287;
+    optional int32 ac_dnt_sth = 288;
+    optional int32 ac_acn_sth = 289;
+
+    optional int32 wtr_clg_cce_mde = 290;
+    optional int32 wtr_clg_ren_rut = 291;
+
+    optional int32 ig_mo2_tmt = 292;
+
+    optional float revise_isl_dcdc_fwd_total_elec_qty = 293;
+
+    optional int32 water_colng_sonid_state = 294;
+    optional int32 water_colng_water_pump_state = 295;
+    optional int32 water_colng_fan_state = 296;
+    optional int32 three_way_valve_state = 297;
+    optional int32 water_colng_ru_state = 298;
+    optional double three_way_valve_febck_votge = 299;
+    optional int32 board_chnge_colng_state = 300;
+    optional double unit_deand_power = 301;
+}
+
+message TripInfo{   
+    optional string trip_id =1;   
+    optional string route_id = 2;
+    optional string driver_id = 3;
+    optional string conductor_id = 4;
+    optional int32 passenger_count = 5;
+    optional string poi_no = 6;
+    optional int32 poi_dist_per = 7;
+    
+    optional string trip_no = 8;
+    optional string route_no = 9;
+    optional string driver_no = 10;
+    optional string conductor_no = 11;
+    
+    optional string timestamp = 12;
+    optional string utc_timestamp = 13;
+}
+
+message ERegionAlarmInfo{
+    optional int32 eregion_type = 1;
+    optional int32 eregion_no = 2;
+    optional int32 event_type = 3;
+}
+
+message LineAlarmInfo{
+}
+
+message OverSpeedAlarmInfo{
+}
+
+message ERegionSpeedInfo{
+	optional int32 eregion_type = 1;
+    optional int32 eregion_no = 2;
+}
+
+message EventInfo{   
+    
+    optional string alarm_info = 1;
+    optional string alarm_info_ext = 2;
+    optional ERegionAlarmInfo area_alarm_info = 3;
+    optional LineAlarmInfo line_alarm_info = 4;
+    optional OverSpeedAlarmInfo over_spd_info = 5;
+    
+    
+    optional int32 ser_fault = 6;
+    optional int32 brake_air_pre_al = 7;
+    optional int32 mo_o_pre_al = 8;
+    optional int32 low_water_l_al = 9;
+    optional int32 brake_shoe_worn_al = 10;
+    optional int32 air_fi_li_al = 11;
+    optional int32 oil_al = 12;
+    optional int32 abs_wo_st = 13;
+    optional int32 wh_tem_al_ex = 14;
+    optional int32 mo_oil_fil_al = 15;
+    optional int32 oil_fil_al = 16;
+    optional int32 mo_oil_tem_al = 17;
+    optional int32 fault_dev_addr = 18;
+    optional int32 fault_level = 19;
+    optional int32 fault_code = 20;
+    
+    
+    optional string timestamp = 21;
+    optional string utc_timestamp = 22;
+	
+	optional int32 vel_bub_wat_ala = 23;
+	optional ERegionSpeedInfo area_speed_info = 24;
+	optional string event_code_list = 25;
+}
+
+enum EventState{   
+    Happen = 0;   
+    Cancel = 1;   
+    NoChange = 2;   
+}
+
+message FaultItem{
+	optional string fault_code_id = 1;
+	optional string pcode = 2;
+	optional string fault_code = 3;
+	optional string fault_desc = 4;
+	
+	optional EventState event_state = 5;
+	optional int32 fault_code_no = 6;
+	optional string fault_name = 7;
+	optional int32 fault_272829_module_num = 8;
+	optional int32 cap_sgl_ov_alm_module_num = 9;
+	
+}
+
+message FaultInfo{   
+    repeated FaultItem fault_item_list = 1;
+    optional string device_fault_state = 2;
+    optional string timestamp = 3;
+    optional string utc_timestamp = 4;
+}
+
+message ExtInfo{   
+    optional string s_msg_resp_id = 1;   
+    optional string s_msg_id = 2;
+    optional int32 s_msg_type = 3;
+    optional string s_msg_content = 4;
+    optional double sd_total_vol = 5;
+    optional double sd_ava_vol = 6;
+    optional int32 img_proc_state = 7;
+    optional string timestamp = 8;
+    optional string utc_timestamp = 9;
+    optional string v_sn = 10;
+    optional string v_code = 11;
+    optional string v_pw_f = 12;
+    optional string v_pw_type = 13;
+}
+
+message FuelCellInfo{
+	optional int32 s_ord_fc = 1;
+	optional float tgt_pow_fc = 2;
+	optional int32 sta_fc = 3;
+	optional float max_cur_fc = 4;
+	optional float cur_fc = 5;
+	optional float vol_fc = 6;
+	optional int32 tri_sta = 7;
+	optional float max_load_pow = 8;
+	optional float act_res_pow = 9;
+	optional float hy_pre_fc = 10;
+	optional float cool_wtr_cond = 11;
+	optional int32 hy_val_sup = 12;
+	optional int32 cool_wtr_lvl = 13;
+	optional int32 tot_rt = 14;
+	optional int32 gas_val_sta = 15;
+	optional float sg_max_vol = 16;
+	optional float sg_min_vol = 17;
+	optional float sg_avg_vol = 18;
+	optional int32 max_vol_sn = 19;
+	optional int32 min_vol_sn = 20;
+	optional int32 temp_fel_cnt_fc = 21;
+	optional int32 temp_fc = 22;
+	optional int32 in_port_temp = 23;
+	optional int32 n_isl_dc_sta = 24;
+	optional float n_isl_dc_tar_cur = 25;
+	optional int32 n_isl_dc_wm = 26;
+	optional float n_isl_dc_rev_tar_cur = 27;
+	optional int32 n_isl_dc_up_temp = 28;
+	optional float n_isl_dc_in_cur = 29;
+	optional float n_isl_dc_out_cur = 30;
+	optional int32 n_isl_dc_in_vol = 31;
+	optional int32 n_isl_dc_out_val = 32;
+	optional int32 bn_sta = 33;
+	optional int32 m_s_v_s = 34;
+	optional float left_hy = 35;
+	optional int32 left_hy_per = 36;
+	optional float hy_hig_pre = 37;
+	optional float hy_low_pre = 38;
+	optional float hy_max_pre = 39;
+	optional int32 hy_max_pre_sn = 40;
+	optional int32 hy_leak_max_con = 41;
+	optional int32 hy_max_con_sn = 42;
+	optional float hy_bn_max_temp = 43;
+	optional int32 max_temp_hy_bno = 44;
+	optional float hy_bn_min_temp = 45;
+	optional int32 min_temp_hy_bno = 46;
+	optional float hy_bn_avg_temp = 47;
+	optional int32 s_sta_fc = 48;
+	optional int32 gas_fp_sta = 49;
+	optional int32 fc_fal_ad = 50;
+	optional int32 fc_fal_c = 51;
+	optional int32 hy_sys_fal_ad = 52;
+	optional int32 hy_sys_fal_c = 53;
+	optional int32 n_isl_dc_fal_ad = 54;
+	optional int32 n_isl_dc_fal_c = 55;
+	optional int32 s24_dc_fal_ad = 56;
+	optional int32 s24_dc_fal_c = 57;
+	optional int32 com_fal_ad = 58;
+	optional int32 com_fal_c = 59;
+	optional float c_rev_tot_pow_fc = 60;
+	optional float c_pos_tot_pow_fc = 61;
+	optional int32 rev_tot_pow_fc = 62;
+	optional int32 pos_tot_pow_fc = 63;
+	optional float c_rev_tot_pow_fc_up = 64;
+	optional float c_pos_tot_pow_fc_up = 65;
+	optional int32 rev_tot_pow_fc_up = 66;
+	optional int32 pos_tot_pow_fc_up = 67;
+	optional int32 rev_tot_pow_s24 = 68;
+	optional int32 pos_tot_pow_s24 = 69;
+	optional float c_rev_tot_pow_s24 = 70;
+	optional float c_pos_tot_pow_s24 = 71;
+	optional double tot_hy_cons = 72;
+
+    optional double revise_tot_hy_cons = 73;
+}
+  
+message RTMsg{
+	
+	required string vehicle_id = 1;
+	required int32 vehicle_no = 2;
+	required string vehicle_vin = 3;
+	optional string vehicle_ln = 4;
+	optional string org_id = 5;
+	optional string ent_id = 6;
+	
+	optional double vehicle_speed = 7;
+	optional int32 acc_state = 8;
+	optional double total_mileage = 9;
+	optional double t_gas_cons = 10;
+	optional double t_e_cons = 11;
+	optional double t_fuel_cons = 12;
+	
+    optional GPSInfo gps_info = 13;
+    optional DoorInfo door_info = 14;
+    optional PowerInfo power_info = 15;
+    optional StateInfo state_info = 16;
+    optional TerminalInfo terminal_info = 17;
+    optional LightInfo light_info = 18;
+    
+    optional ConditionDataInfo cond_data_info = 19;
+    
+    
+    optional TripInfo trip_info = 20;
+    optional FaultInfo fault_info = 21;
+    optional ExtInfo ext_info = 22;
+    optional EventInfo event_info = 23;
+    
+    optional int32 gps_valid = 24;
+    optional double gps_latitude = 25;
+    optional double gps_longitude = 26;
+    optional double e_rotate_spd = 27;
+    optional int32 is_power_valid = 28;
+    optional string app_inst_id = 29;
+    optional string rece_time = 30;
+    optional string terminal_time_0200 = 31;
+    
+    optional string seq = 32;
+    
+    optional int32 eltric_v_type = 33;
+	
+	optional MainMotorTotalInfo m_m_total_inf = 34;
+	
+	optional FuelCellInfo fuel_cell_info = 35;
+	
+	optional VideoAlarmInfo video_alarm_info =36;
+	
+	optional AbnDrivingType abn_driving_type =37;
+	
+	optional int32 degree_fatigue = 38;
+	optional string bus_route_no = 39;
+	optional string business_type = 40;
+	
+	optional AdasInfo adas_info = 41;
+	
+	optional int32 okj_mileage = 42;
+	optional QuickChangeBatteryInfo q_c_battery_info = 43;
+	optional NanCheInfo nanche_info = 44;
+	optional SongZengInfo songzeng_info = 45;
+	optional TpmsInfo tpms_info = 46;
+	optional int32 speed_source=47;
+	optional SimFluxInfo sim_flux_info = 48;
+	optional string phone_no =49;
+	optional JydTailGasInfo jyd_tail_gas_info =50;
+	
+	optional CanBusStateInfo can_bus_state_info = 51;
+    optional int32 is_revised = 52;
+    
+    optional SglCapOverflowModelInfo sgl_cap_of_m_no_info = 53;
+    optional TheHitchModelInfo t_hitch_model_no_info = 54;
+    
+    optional HWInfo hw_info = 55;
+    
+    optional double revise_total_mileage = 56;
+    
+    optional int32 buss_type = 57;
+
+	optional int32 op_state = 58;
+
+    optional EngineExtraData engine_info = 59;
+
+    optional double voltage = 60;
+
+    optional CLingInfo cling_info = 61;
+
+    optional MvcsInfo mvcs_info = 62;
+    optional AutomaticDriveInfo automatic_drive_info = 63;
+
+    optional double vss_speed = 64;
+    optional double vss_speed2 = 65;
+    optional double can_speed = 66;
+    optional int32 poo_tpe = 67;
+
+    optional NewEnergyDevInfo new_energy_dev_info = 68;
+
+    optional DriverStateMonitorInfo driver_state_monitor_info = 69;
+
+    optional AdasEventInfo adas_event_info = 70;
+
+    optional BlindAreaMonitor blind_area_monitor = 71;
+
+    optional EsVehicleWorkStateInfo es_vehicle_work_state_info = 72;
+
+    optional EatonInfo eaton_info = 73;
+
+}
+
+message NewEnergyDevInfo{
+    optional int32 device_addr = 1;
+    optional int32 soft_final_year = 2;
+    optional int32 soft_final_month = 3;
+    optional int32 soft_final_day = 4;
+    optional int32 soft_main_ver = 5;
+    optional int32 soft_sub_ver_h = 6;
+    optional int32 soft_sub_ver_l = 7;
+    optional int32 hard_main_ver = 8;
+    optional int32 hard_sub_ver_h = 9;
+    optional int32 hard_sub_ver_l = 10;
+}
+
+message EngineExtraData{
+    optional int32 engine_speed = 1;
+    optional int32 se_bty_ve = 2;
+    optional int32 oil_pe_st = 3;
+    optional int32 pg_lamp_ss = 4;
+    optional int32 mil_lamp_ss = 5;
+    optional int32 te_ik_sh = 6;
+    optional int32 ee_ay_sn_sh = 7;
+    optional int32 re_te_sh = 8;
+    optional int32 ee_rr_sn = 9;
+    optional int32 ebs_sh = 10;
+    optional int32 ve_te_cl = 11;
+    optional int32 ct_sd_load_pe = 12;
+    optional int32 fn_rate = 13;
+    optional int32 ae_fuel_cn_rate = 14;
+    optional int32 tl_ee_on_time = 15;
+    optional int32 ee_oil_pe = 16;
+    optional int32 kms_se_bty_ve = 17;
+    optional int32 e2_ay_sn_sh = 18;
+    optional int32 ie_pe = 19;
+    optional int32 ie_md_te = 20;
+    optional int32 ee_ct_te = 21;
+    optional int32 ee_oil_te = 22;
+    optional int32 isc_mm_sd_cl = 23;
+    optional int64 mr_tl_oil_cn = 24;
+}
+
+message MvcsInfo{
+    optional int32 mgd_lne = 1;
+    optional int32 mvw_mde = 2;
+    optional int32 msl_clr = 3;
+    optional int32 mvw_slt = 4;
+}
+
+
+message CLingInfo{
+    optional  int32 ac_pl_sg_temp_cl_in_g = 1;
+    optional  int32 ac_ctl_work_ss_cl_in_g = 2;
+    optional  int32 ac_ctl_cr_ss_cl_in_g = 3;
+    optional  int32 ac_wind_gear_cl_in_g = 4;
+    optional  int32 ac_bn_id_cl_in_g = 5;
+    optional  int32 ac_bn_sum_cl_in_g = 6;
+    optional  int32 ac_dn_ss_cl_in_g = 7;
+    optional  int32 ac_work_mode_cl_in_g = 8;
+    optional  int32 ac_er_gear_cl_in_g = 9;
+    optional  int32 ac_cr_ss_cl_in_g = 10;
+    optional  int32 ac_fh_air_ss_cl_in_g = 11;
+    optional  int32 ac_ec_heat_top_ss_cl_in_g = 12;
+    optional  int32 ac_ec_heat_bm_ss_cl_in_g = 13;
+    optional  int32 ac_four_way_ss_cl_in_g = 14;
+    optional  int32 ac_pe_ss_cl_in_g = 15;
+    optional  int32 ac_cool_dt_cl_in_g = 16;
+    optional  int32 ac_head_dt_cl_in_g = 17;
+    optional  int32 ac_er_duty_cl_in_g = 18;
+    optional  int32 ac_cg_duty_cl_in_g = 19;
+    optional  string ac_ft_code_cl_in_g = 20;
+    optional  int32 ac_cr_sd_cl_in_g = 21;
+    optional  int32 ac_ue_cl_in_g = 22;
+    optional  int32 ac_en_ve_cl_in_g = 23;
+    optional  int32 ac_cr_ue_cl_in_g = 24;
+    optional  int32 ac_er_ue_cl_in_g = 25;
+    optional  int32 ac_cg_ue_cl_in_g = 26;
+    optional  int32 ac_de_left_temp_cl_in_g = 27;
+    optional  int32 ac_ie_left_temp_cl_in_g = 28;
+    optional  int32 ac_out_side_left_temp_cl_in_g = 29;
+    optional  int32 ac_er_core_left_temp_cl_in_g = 30;
+    optional  int32 ac_ce_core_left_temp_cl_in_g = 31;
+    optional  int32 ac_an_left_temp_cl_in_g = 32;
+    optional  int32 ac_er_left_temp_cl_in_g = 33;
+    optional  int32 ac_de_rt_temp_cl_in_g = 34;
+    optional  int32 ac_ie_rt_temp_cl_in_g = 35;
+    optional  int32 ac_out_side_rt_temp_cl_in_g = 36;
+    optional  int32 ac_er_core_rt_temp_cl_in_g = 37;
+    optional  int32 ac_ce_core_rt_temp_cl_in_g = 38;
+    optional  int32 ac_an_rt_temp_cl_in_g = 39;
+    optional  int32 ac_er_rt_temp_cl_in_g = 40;
+    optional  float ac_pe_high_left_cl_in_g = 41;
+    optional  float ac_pe_low_left_cl_in_g = 42;
+    optional  float ac_pe_high_rt_cl_in_g = 43;
+    optional  float ac_pe_low_rt_cl_in_g = 44;
+    optional  float ac_ct_tl_cl_in_g = 45 ;
+    optional  int32 ac_high_ve_tl_cl_in_g = 46 ;
+    optional  int32 ac_low_ve_tl_cl_in_g = 47 ;
+    optional  float ac_er_ct_cl_in_g = 48 ;
+    optional  float ac_ce_ct_cl_in_g = 49 ;
+    optional  float ac_cr_c1_cl_in_g = 50 ;
+    optional  float ac_cr_c2_cl_in_g = 51 ;
+}
+
+
+message HWInfo{
+	optional int32 tar_driver_mode_hw = 1;
+	optional int32 act_driver_mode_hw = 2;
+	optional int32 act_gears_hw = 3;
+	optional float act_speed_hw = 4;
+	optional int32 brake_p_cond_hw = 5;
+	optional float tar_speed_hw = 6;
+	optional int32 tar_gears_hw = 7;
+	optional int32 tar_steering_angle_hw = 8;
+	optional int32 tar_stop_c_b_g_hw = 9;
+	optional float tar_sub_speed_hw = 10;
+	optional int32 act_steering_angle_hw = 11;
+	optional int32 act_stop_c_b_g_hw = 12;
+	optional float act_sub_speed_hw = 13;
+	optional int32 car_yaw_speed_hw = 14;
+	optional int32 car_cros_speed_hw = 15;
+	optional int32 turn_light_status_hw = 16;
+	optional int32 brake_l_status_hw = 17;
+	optional int32 back_car_l_status_hw = 18;
+	optional int32 head_l_status_hw = 19;
+	optional int32 clear_caution_l_status_hw = 20;
+	optional int32 trumpet_status_hw = 21;
+	optional int32 watering_status_hw = 22;
+	optional int32 clear_mode_hw = 23;
+	optional int32 back_door_location_hw = 24;
+	optional int32 box_location_hw = 25;
+	optional int32 sucker_location_hw = 26;
+	optional int32 channel_brush_hw = 27;
+	optional int32 water_tank_hw = 28;
+	optional int32 waste_location_hw = 29;    
+	optional int32 nl_gear_ss_hw = 30;
+    optional int32 kg_sf_hw = 31;
+    optional int32 low_oil_pe_hw = 32;
+    optional int32 et_be_lamp_hw = 33;
+    optional int32 ee_be_lamp_hw = 34;
+    optional int32 ce_cl_eg_hw = 35;
+    optional int32 pg_be_sh_hw = 36;
+    optional int32 cg_cl_an_hw = 37;
+    optional int32 be_sh_se_hw = 38;
+    optional int32 ch_sh_se_hw = 39;
+    optional int32 ce_cl_set_sd_hw = 40;
+    optional int32 ce_cl_se_hw = 41;
+    optional int32 ee_te_pe_hw = 42;
+    optional int32 ar_pl_low_idle_hw = 43;
+    optional int32 wg_ml_hw = 44;
+    optional int32 me_cn_hw = 45;
+    optional int32 se_cn_hw = 46;
+    optional int32 anti_sh_hw = 47;
+    optional int32 ge_cg_hw = 48;
+    optional int32 sr_an_hw = 49;
+    optional int32 se_an_hw = 50;
+    optional int32 pull_sl_an_hw = 51;
+    optional int32 fr_an_hw = 52;
+    optional int32 ug_an_hw = 53;
+    optional int32 ft_am_code_hw = 54;
+    optional int32 me_cn_ss_hw = 55;
+    optional int32 se_cn_ss_hw = 56;
+    optional int32 anti_sh_ss_hw = 57;
+    optional int32 ge_cg_ss_hw = 58;
+    optional int32 cr_ht_pe_hw = 59;
+    optional int32 can_pl_pr_sy_hw = 60;
+    optional int32 can_pl_stop_hw = 61;
+    optional int32 work_mode_sh_hw = 62;
+    optional int32 ge_cn_sh_hw = 63;
+    optional int32 fr_an_sh_hw = 64;
+    optional int32 pull_sl_an_sh_hw = 65;
+    optional int32 ug_an_sh_hw = 66;
+    optional int32 fr_lock_stop_sh_hw = 67;
+    optional int32 ey_stop_but_hw = 68;
+    optional int32 se_loop_hw = 69;
+    optional int32 me_loop_hw = 70;
+    optional int32 anti_sh_mode_hw = 71;
+    optional int32 sr_ce_sl_hw = 72;
+    optional int32 se_ce_sl_hw = 73;
+    optional int32 pull_sl_ce_sl_hw = 74;
+    optional int32 hook_lock_ce_sl_hw = 75;
+    optional int32 fr_down_ce_sl_hw = 76;
+    optional int32 se_up_pe_sh_hw = 77;
+    optional int32 sr_pe_sh_hw = 78;
+    optional int32 job_mg_sh_hw = 79;
+    optional int32 hr_bn_sh_hw = 80;
+    optional int32 big_box_bn_sh_hw = 81;
+    optional int32 dt_but_sh_hw = 82;
+    optional int32 rg_sl_sh_hw = 83;
+    optional int32 be_tank_over_am_hw = 84;
+    optional int32 dr_am_sl_hw = 85;
+    optional int32 wi_fi_stop_sh_hw = 86;
+    optional int32 fr_up_sd_ve_hw = 87;
+    optional int32 fr_down_sd_ve_hw = 88;
+    optional int32 pull_sl_of_fsd_ve_hw = 89;
+    optional int32 pull_sl_on_sd_ve_hw = 90;
+    optional int32 ug_up_sd_ve_hw = 91;
+    optional int32 ug_down_sd_ve_hw = 92;
+    optional int32 sr_open_sd_ve_hw = 93;
+    optional int32 sr_ce_sd_ve_hw = 94;
+    optional int32 se_up_sd_ve_hw = 95;
+    optional int32 se_down_sd_ve_hw = 96;
+    optional int32 hook_lock_ce_sd_ve_hw = 97;
+    optional int32 fr_hw = 98;
+    optional int32 te_ae_hw = 99;
+    optional int32 ge_box_over_hw = 100;
+    optional int32 work_lamp_hw = 101;
+    optional int32 dt_cl_hw = 102;
+    optional int32 hr_ec_push_rod_hw = 103;
+    optional int32 big_box_ec_push_rod_hw = 104;
+    optional int32 fe_high_pe_ec_hw = 105;
+    optional float fe_mr_tt_sd_hw = 106;
+    optional float fe_no2_mr_tt_sd_hw = 107;
+    optional int32 fe_mr_ot_te_hw = 108;
+    optional float fe_mr_sd_hw = 109;
+    optional int32 fe_mr_te_hw = 110;
+    optional int32 fe_mr_cl_te_hw = 111;
+    optional int32 fe_mr_cl_br_ct_hw = 112;
+    optional int32 fe_mr_cl_br_ve_hw = 113;
+    optional float fe_mr_cl_ot_pr_hw = 114;
+    optional float fe_mr_cl_pe_sum_pr_hw = 115;
+    optional float fe_mr_cl_pe_se_pr_hw = 116;
+    optional int32 fe_no2_mr_ot_te_hw = 117;
+    optional float fe_no2_mr_sd_hw = 118;
+    optional int32 fe_no2_mr_te_hw = 119;
+    optional int32 fe_no2_mr_cl_te_hw = 120;
+    optional int32 fe_no2_mr_cl_br_ct_hw = 121;
+    optional int32 fe_no2_mr_cl_br_ve_hw = 122;
+    optional float fe_no2_mr_cl_ot_pr_hw = 123;
+    optional float fe_no2_mr_cl_pe_sum_pr = 124;
+    optional float fe_no2_mr_cl_pe_se_pr_hw = 125;
+    optional int32 sr_lg_se_hw = 126;
+    optional int32 left_bt_wt_hw = 127;
+    optional int32 rt_bt_wt_hw = 128;
+    optional float main_ct_ve_hw = 129;
+    optional int64 ce_wt_hw = 130;
+    optional int32 ac_fh_air_sh_hw = 131;
+    optional int32 ac_dt_sh_hw = 132;
+    optional int32 ac_pe_sh_hw = 133;
+    optional int32 ac_an_sh_hw = 134;
+    optional float ac_evap_fan_sd_pt_hw = 135;
+    optional float ac_cond_fan_sd_pt_hw = 136;
+    optional int32 ac_comp_cn_pe_hw = 137;
+    optional float ac_ve_hw = 138;
+    optional int32 ac_evap_temp_rt_core_hw = 139;
+    optional int32 ac_cr_sh_ss_hw = 140;
+    optional int32 ac_sm_ve_low_hw = 141;
+    optional int32 ac_sm_ve_ht_hw = 142;
+    optional int32 rn_sm_low_sh_left_hw = 143;
+    optional int32 rn_sm_hig_sh_rt_hw = 144;
+    optional int32 er_fan_ft_hw = 145;
+    optional int32 cg_fan_ft_hw = 146;
+    optional int32 er_sr_ft_rt_hw = 147;
+    optional int32 er_sr_ft_left_hw = 148;
+    optional int32 cg_sr_ft_hw = 149;
+    optional int32 car_oe_te_sr_ft_hw = 150;
+    optional int32 rn_air_sr_ft_hw = 151;
+    optional int32 pe_sr_ft_hw = 152;
+    optional int32 cr_ue_ft_hw = 153;
+    optional int32 cr_oe_ft_hw = 154;
+    optional int32 cr_me_al_hw = 155;
+    optional int32 cr_me_lose_hw = 156;
+    optional int32 ec_fan_de_heat_hw = 157;
+    optional int32 ft_in_hw = 158;
+    optional int32 rn_fan_te_hw = 159;
+    optional int32 dn_ss_hw = 160;
+    optional int32 ac_fh_air_ss_hw = 161;
+    optional int32 ac_work_ss_hw = 162;
+    optional int32 sg_wind_sd_hw = 163;
+    optional int32 dt_hw = 164;
+    optional int32 blow_head_or_blow_foot_hw = 165;
+    optional int32 sn_mh_lift_hw = 166;
+    optional int32 back_door_sh_hw = 167;
+    optional int32 big_box_lift_hw = 168;
+    optional int32 ft_left_bh_re_hw = 169;
+    optional int32 ft_rt_bh_re_hw = 170;
+    optional int32 last_left_bh_re_hw = 171;
+    optional int32 last_rt_bh_re_hw = 172;
+    optional int32 bh_re_cl_pn_hw = 173;
+    optional int32 bh_re_sl_cl_pn_hw = 174;
+    optional int32 bh_re_sd_cl_hw = 175;
+    optional int32 ft_left_bh_lift_hw = 176;
+    optional int32 ft_rt_bh_up_dwon_hw = 177;
+    optional int32 sn_mh_sh_hw = 178;
+    optional int32 rg_bh_re_cl_pn_hw = 179;
+    optional int32 rg_bh_re_sl_cl_hw = 180;
+    optional float rg_bh_re_sd_cl_hw = 181;
+    optional int32 left_ab_sh_hw = 182;
+    optional int32 rt_ab_sh_hw = 183;
+    optional int32 sn_ne_wr_ve_hw = 184;
+    optional int32 left_sr_wr_ve_hw = 185;
+    optional int32 rt_sr_wr_ve_hw = 186;
+    optional int32 ht_self_cg_wr_ve_hw = 187;
+    optional int32 ht_sy_wr_ve_hw = 188;
+    optional int32 ht_sy_gun_wr_ve_hw = 189;
+    optional int32 ht_wr_pump_ch_hw = 190;
+    optional int32 sn_sr_ve_hw = 191;
+    optional int32 box_sr_ve_hw = 192;
+    optional int32 last_bh_sr_ve_hw = 193;
+    optional int32 left_ft_bh_sr_ve_hw = 194;
+    optional int32 rt_ft_bh_sr_ve_hw = 195;
+    optional int32 sr_ec_m1_hw = 196;
+    optional int32 sr_ec_m2_hw = 197;
+    optional int32 sr_ec_m3_hw = 198;
+    optional int32 left_work_lamp_hw = 199;
+    optional int32 rt_work_lamp_hw = 200;
+    optional int32 mc_horn_hw = 201;
+    optional int32 pt_mr_hw = 202;
+    optional int32 cg_wr_pump_hw = 203;
+    optional int32 cg_fan_hw = 204;
+    optional int32 box_br_hw = 205;
+    optional int32 wr_se_of_mr_ct_hw = 206;
+    optional int32 low_pe_am_hw = 207;
+    optional int32 tl_wr_ve_tg_hw = 208;
+    optional int32 test_cn_wr_box_hw = 209;
+    optional int32 se_tank_in_hw = 210;
+    optional int32 sy_pole_dn_hw = 211;
+    optional int32 pe_door_og_dn_hw = 212;
+    optional int32 pe_door_cg_dn_hw = 213;
+    optional int32 le_box_lg_dn_hw = 214;
+    optional int32 le_box_drop_dn_hw = 215;
+    optional int32 wr_tank_wr_hw = 216;
+    optional float fe_ct_sd_mr_hw = 217;
+    optional int32 rn_dn_mr_hw = 218;
+    optional float ct_sd_of_pump_mr_hw = 219;
+    optional int32 rn_dn_m2_hw = 220;
+
+    optional double hw_sps_wtr = 221;
+    optional double hw_sps_wtr_pct = 222;
+    optional int32 hw_sps_wtr_aam = 223;
+    optional int32 hw_tmp_aam_sth = 224;
+    optional int32 hw_tmp_aam_eet = 225;
+    optional int32 hw_tmp_aam_sts = 226;
+    optional double hw_crt_tmp = 227;
+    optional int32 hw_stop_state = 228;
+    optional int32 hw_nowConsoleMode_state=229;
+    optional int32 sl_se_hw=230;
+    optional int32 se_se_hw=231;
+    optional int32 door_se_hw=232;
+    optional int32 mr_se_hw=233;
+    optional int32 cn_box_se_hw=234;
+    optional int32 ft_door_se_hw=235;
+    optional int32 lock_se_hw=236;
+    optional int32 cn_se_hw=237;
+    optional float pe_of_ge_hw=238;
+    optional float ge_box_full_am_hw=239;
+    optional float main_ct_ct_hw = 240;
+    optional int32 main_pump_pe_hw = 241;
+    optional int32 ct_self_ft_hw = 242;
+    optional int32 fe_of_cn_mm_hw = 243;
+    optional int32 lg_ft_hw = 244;
+    optional int32 door_ft_hw = 245;
+    optional int32 ft_door_ft_hw = 246;
+    optional int32 se_sm_ft_hw = 247;
+    optional float e_full_am_hw = 248;
+    optional int32 door_long_time_not_ce_hw = 249;
+    optional int32 hc_oil_temp_hw = 250;
+    optional int32 hy_hw = 251;
+    optional int32 gl_re_hw = 252;
+
+    optional double aumic_corss_count_hw = 253;
+    optional double main_cicit_votge_bpase_hw = 254;
+    optional double main_cicit_votge_cpase_hw = 255;
+    optional double main_cicit_curnt_bpase_hw = 256;
+    optional double main_cicit_curnt_cpase_hw = 257;
+
+    optional double fe_no3_motor_taget_speed_hw = 258;
+    optional double fe_no4_motor_taget_speed_hw = 259;
+    optional int32 fe_motor_swtch_state_hw = 260;
+    optional int32 big_box_work_state_hw = 261;
+    optional int32 rain_and_snow_mode_hw = 262;
+    optional double fe_no3_motor_ouput_toque_hw = 263;
+    optional double fe_no3_motor_speed_hw = 264;
+    optional double fe_no3_motor_terre_hw = 265;
+    optional double fe_no3_motor_cotol_terre_hw = 266;
+    optional double fe_no3_motor_cotol_bubar_curnt_hw = 267;
+    optional double fe_no3_motor_cotol_bubar_votge_hw = 268;
+    optional double fe_no3_motor_cotol_potve_sum_power_hw = 269;
+    optional double fe_no3_motor_cotol_potve_sigle_power_hw = 270;
+    optional double fe_no4_motor_ouput_toque_hw = 271;
+    optional double fe_no4_motor_speed_hw = 272;
+    optional double fe_no4_motor_terre_hw = 273;
+    optional double fe_no4_motor_cotol_terre_hw = 274;
+    optional double fe_no4_motor_cotol_bubar_curnt_hw = 275;
+    optional double fe_no4_motor_cotol_bubar_votge_hw = 276;
+    optional double fe_no4_motor_cotol_potve_sum_power_hw = 277;
+    optional double fe_no4_motor_cotol_potve_sigle_power_hw = 278;
+
+    optional double ac_panel_setng_temp_hw = 279;
+}
+
+message SglCapOverflowModelInfo{
+	repeated int32 SglCapOverflowModelNo = 1;
+}
+
+message TheHitchModelInfo{
+	repeated int32 TheHitchModelNo = 1;
+}
+
+message CanBusStateInfo{
+	repeated CanBusStateObj can_bus_state_obj_list = 1;
+}
+
+message CanBusStateObj{
+	optional int32 can_channel_id = 1;
+	optional int32 can_error_frame_cnt = 2;
+	optional int32 can_load_ratio = 3;
+}
+
+message JydTailGasInfo{
+   optional int32 exhaust_temp_t1 = 1;
+   optional int32 exhaust_temp_t2 = 2;
+   optional int32 exhaust_temp_t3 = 3;
+   optional int32 exhaust_temp_t4 = 4;
+   optional int32 exhaust_pre = 5;
+   optional int32 dpf_state = 6;
+   optional int32 clutch_state_jyd = 7;
+   optional int32 scr_state = 8;
+   optional int32 nox_conver_eff = 9;
+   optional int32 urea_injec_rate = 10;
+   optional int32 after_flue_injec_rate = 11;
+   optional int32 urea_level_jyd = 12;
+   optional int32 scr_frt_nox_concentration = 13;
+   optional int32 scr_bck_nox_concentration = 14;
+}
+
+
+message SimFluxInfo{
+	optional double msg_flux = 1;
+	optional double photo_flux = 2;
+	optional double video_flux = 3;
+	optional double total_flux = 4;
+}
+
+message VideoAlarmInfo{
+	optional int32 video_loss =1;
+	optional int32 main_me_fault = 2;
+	optional int32 backup_f_disater_memory_cell = 3;
+	optional int32 other_video_equipment = 4;
+	optional int32 bus_overload_alarm = 5;
+	optional int32 abn_drivin_behavior = 6;
+	optional int32 pecial_ala_video_sto_threshold = 7;
+	optional string video_loss_alarm_pos = 8;
+	optional string video_cover_alarm_pos = 9;
+	optional string mem_alarm_pos = 10;
+}
+
+message AbnDrivingType{
+	optional int32 fatigue_state =1;
+	optional int32 phone_state = 2;
+	optional int32 smoking_state = 3;
+}
+
+message AdasInfo{
+	optional int32 ldw_warn = 1;
+	optional int32 ldw_l_status = 2;
+	optional int32 ldw_sys_status = 3;
+	optional float ldw_l_dep_dis = 4;
+	optional float ldw_r_dep_dis = 5;
+	optional int32 fcw_warn = 6;
+	optional int32 fcw_v_status = 7;
+	optional int32 fcw_sys_s = 8;
+	optional float fcw_li_dis = 9;
+	optional float fcw_lo_dis = 10;
+	optional float fcw_l_r_speed = 11;
+	optional int32 mod_warn = 12;
+	optional int32 mod_l_dis = 13;
+}
+
+message QuickChangeBatteryInfo{
+	optional int32 c_life_c_counter = 1;
+	optional int32 t_diff_alarm = 2;
+	optional int32 h_temp = 3;
+	optional int32 h_pre_le_alarm = 4;
+	optional int32 elec_alarm = 5;
+	optional int32 elec_discharge = 6;
+	optional int32 m_o_vol_alarm = 7;
+	optional int32 b_g_o_vol_alarm = 8;
+	optional int32 m_un_vol_alarm = 9;
+	optional int32 b_g_un_vol_alarm = 10;
+	optional int32 s_diff_alarm = 11;
+	optional int32 s_low_alarm = 12;
+	optional int32 s_h_alarm = 13;
+	optional int32 m_v_diff_alarm = 14;
+	optional int32 b_un_vol_alarm = 15;
+	optional int32 h_temp_alarm = 16;
+	optional int32 c_com_alarm = 17;
+	optional int32 l_com_alarm = 18;
+	optional int32 w_al_status = 19;
+	optional int32 warm_status = 20;
+	optional int32 b_al_status = 21;
+	optional int32 balance_status = 22;
+	optional int32 h_temp_status = 23;
+	optional int32 p_b_un_status = 24;
+	optional int32 p_b_status = 25;
+}
+
+message NanCheInfo{
+	optional int32 nc_dev_s_s_flag = 1;
+	optional int32 nc_m_o_temp = 2;
+	optional int32 nc_m_c_o_temp = 3;
+	optional int32 nc_d_b_pedal = 4;
+	optional float nc_c_voltage = 5;
+	optional float nc_p_s_voltage = 6;
+	optional float nc_dc_elec = 7;
+	optional float nc_c_elec = 8;
+	optional int32 nc_temp_o_controller = 9;
+	optional int32 nc_d_temp = 10;
+	optional float nc_dev_s_p_cons = 11;
+	optional float nc_b_a_voltage = 12;
+	optional float nc_b_a_elec = 13;
+	optional double nc_b_soc = 14;
+	optional int32 nc_m_voltage_h = 15;
+	optional int32 nc_m_voltage_l = 16;
+	optional int32 nc_soc_o_hig = 17;
+	optional int32 nc_soc_o_low = 18;
+	optional int32 nc_c_o_current = 19;
+	optional int32 nc_d_o_current = 20;
+	optional int32 nc_b_temp_hig = 21;
+	optional int32 nc_b_n_t_match = 22;
+	optional int32 nc_a_voltage_h = 23;
+	optional int32 nc_a_voltage_l = 24;
+	optional int32 nc_voltage_n_b = 25;
+	optional int32 nc_temp_n_b = 26;
+	optional int32 nc_t_level = 27;
+	optional float nc_b_m_l_voltage = 28;
+	optional float nc_b_m_h_voltage = 29;
+	optional int32 nc_b_m_l_temp = 30;
+	optional int32 nc_b_m_h_temp = 31;
+	optional int32 nc_h_v_box_num = 32;
+	optional int32 nc_h_v_b_p = 33;
+	optional int32 nc_l_v_b_num = 34;
+	optional int32 nc_l_v_b_pos = 35;
+	optional int32 nc_h_temp_b_num = 36;
+	optional int32 nc_h_temp_b_pos = 37;
+	optional int32 nc_l_temp_b_num = 38;
+	optional int32 nc_l_temp_b_pos = 39;
+	optional float nc_dc_dc_o_v = 40;
+	optional float nc_dc_dc_o_elec = 41;
+	optional int32 nc_h_v_c_m_status = 42;
+	optional int32 nc_s_insul_1 = 43;
+	optional int32 nc_s_insul_2 = 44;
+	optional int32 nc_insul_f_l_l = 45;
+	optional int32 nc_e_l_alarm = 46;
+	optional int32 nc_gid_vte = 47;
+    optional int32 nc_gid_crt = 48;
+    optional double nc_cre_eec_ery = 49;
+}
+
+message SongZengInfo{
+	optional int32 sz_speed = 1;
+	optional int32 sz_gears = 2;
+	optional int32 sz_m_m_status = 3;
+	optional int32 sz_m_m_n_o_t = 4;
+	optional float sz_m_m_n_rev = 5;
+	optional int32 sz_m_m_temp = 6;
+	optional int32 sz_d_n_o_torque = 7;
+	optional float sz_d_n_o_rev = 8;
+	optional int32 sz_d_temp = 9;
+	optional int32 sz_prec_contactor = 10;
+	optional int32 sz_cluth_status = 11;
+	optional int32 sz_gen_c_un_b_cur = 12;
+}
+
+message TpmsInfo{
+	optional int32 tpms_t_position = 1;
+	optional int32 tpms_t_pressure = 2;
+	optional float tpms_t_temp = 3;
+	optional int32 tpms_status = 4;
+	optional int32 tpms_s_num = 5;
+	optional int32 tpms_pre_v_testing = 6;
+}
+
+message AutomaticDriveInfo{
+    optional int32 htt_sgn = 1;
+    optional int32 slf_ckg_fag = 2;
+    optional int32 es_dvg_sae = 3;
+    optional int32 amc_dvg_mde = 4;
+    optional float lft_trn_lgt_sts = 5;
+    optional float sit_lgt_sts = 6;
+    optional float rgt_trn_lgt_sts = 7;
+    optional float swk_rg_lgt_sts = 8;
+    optional float lft_trn_lgt_rig_sos = 9;
+    optional float sit_lgt_rig_sos = 10;
+    optional float rgt_trn_lgt_rig_sos = 11;
+    optional float swk_rg_lgt_rig_sos = 12;
+    optional int32 amc_die_stg_sed = 13;
+    optional int32 rng_sae = 14;
+    optional int32 dcn_rng_sts = 15;
+    optional int32 go_to_cgg_ple_sae = 16;
+    optional int32 rah_ste_sts = 17;
+    optional int32 rah_pkg_sae = 18;
+    optional int32 nbr_of_ail_stn = 19;
+    optional int32 nbr_of_ail_pkg_scs = 20;
+    optional int32 nbr_of_ail_cgg_pls = 21;
+    optional int32 pkg_tps = 22;
+    optional int32 ade_tps = 23;
+    optional int32 oag_tps = 24;
+    optional int32 cne_tak_tps = 25;
+    optional int32 sow_dwn_pmt = 26;
+    optional int32 srg_hnt = 27;
+    optional int32 car_air_qly_sts = 28;
+    optional int32 roe_air_ftn_cde = 29;
+    optional int32 set_or_qey_rus = 30;
+    optional int32 bwg_mde = 31;
+    optional int32 oen_btn_snl = 32;
+    optional int32 coe_btn_snl = 33;
+    optional int32 dor_sae = 34;
+    optional int32 ati_cpg_sae = 35;
+    optional int32 egy_sae = 36;
+    optional int32 uok_mtr_opt = 37;
+    optional int32 chn_opt = 38;
+    optional int32 uok_mtr_opt_doc_sae = 39;
+    optional int32 bae_lck_opt_doc_sae = 40;
+    optional int32 slf_lng_sae = 41;
+    optional int32 pwr_mde_snl = 42;
+    optional int32 mtr_sat_ctl = 43;
+    optional int32 vie_pwr_mde = 44;
+    optional int32 get_off_rut = 45;
+    optional int32 bae_lgt_sn2 = 46;
+    optional int32 pwr_rly_fle_snl = 47;
+    optional int32 nxt_sop_nbr = 48;
+    optional int32 air_cin_cer_wrk_sae = 49;
+    optional int32 dvg_rne = 50;
+    optional int32 bty_cag_sae = 51;
+    optional int32 dvg_mde = 52;
+    optional int32 air_cin_ctl = 53;
+    optional int32 ohe_sae = 54;
+    optional int32 ian_dcr_tgr_ctl = 55;
+    optional int32 es_srg_wel_age = 56;
+    optional int32 srg_wel_rtn = 57;
+    optional int32 etc_srg_mde = 58;
+    optional int32 aur_vcy = 59;
+    optional int32 es_fut_imn = 60;
+    optional int32 es_fut_lvl = 61;
+    optional int32 es_fut_cde = 62;
+    optional int32 bms_air_cin_ctl = 63;
+    optional int32 bty_fut_lvl = 64;
+    optional int32 bty_fut_cde = 65;
+    optional int32 epb_stm_sts = 66;
+    optional int32 pkg_fle_mde = 67;
+    optional float pkg_fre = 68;
+    optional double sed_imn = 69;
+    optional int32 ec_stm_fut_sae = 70;
+    optional int32 erc_drn = 71;
+    optional int32 erc_drn_eis = 72;
+    optional int32 ec_pkg_ctl_rut = 73;
+    optional int32 sop_hld_sae = 74;
+    optional double lft_fot_wel_sed = 75;
+    optional double rgt_fot_wel_sed = 76;
+    optional double lft_rar_wel_sed = 77;
+    optional double rgt_rar_wel_sed = 78;
+    optional int32 lft_fot_wel_sed_ple = 79;
+    optional int32 rgt_fot_wel_sed_ple = 80;
+    optional int32 lft_rar_wel_sed_ple = 81;
+    optional int32 rgt_rar_wel_sed_ple = 82;
+    optional float ec_lel_arn = 83;
+    optional float ec_lul_arn = 84;
+    optional float lul_arn_eis = 85;
+    optional float lel_arn_vdy = 86;
+    optional int32 ic_stm_fle_sae = 87;
+    optional int32 ic_wkg_mde = 88;
+    optional int32 drn_rut_vdy = 89;
+    optional int32 bae_rut_vdy = 90;
+    optional int32 bae_lgt_ctl_sts = 91;
+    optional int32 ln1_min_cnr_pse = 92;
+    optional int32 mtr_cnr_woe_vld_bit = 93;
+    optional int32 ln2_pse_ece_lvl = 94;
+    optional int32 ln2_min_cnr_pse = 95;
+    optional float mtr_cnr_soe = 96;
+    optional int32 fut_imn = 97;
+    optional int32 ec_pse_rut_iir = 98;
+    optional int32 pkg_ctl_rut = 99;
+    optional int32 sop_hld = 100;
+    optional int32 rut_ec_to_pve_hac = 101;
+    optional float tue_sed = 102;
+
+    optional double gps_lot_5m = 103;
+    optional int32 gps_lot_valid_5m = 104;
+    optional int32 gps_lot_zone_5m = 105;
+    optional double gps_lat_5m = 106;
+    optional int32 gps_lat_valid_5m = 107;
+    optional int32 gps_lat_zone_5m = 108;
+}
+
+message DriverStateMonitorInfo{   
+    optional string alarm_id =1;   
+    optional int32 flag_state = 2;
+    optional int32 alarm_or_event_type = 3;
+    optional int32 alarm_level = 4;
+    optional int32 fatigue_level = 5;
+    optional int32 alarm_vehicle_speed = 6;
+    optional int32 alarm_elevation = 7;
+    optional string alarm_latitude = 8;
+    optional string alarm_longitude = 9;
+	optional string alarm_time = 10;
+	optional string alarm_vehicle_state = 11;
+	optional string alarm_logo_terminal_id = 12;
+	optional string alarm_logo_alarm_time = 13;
+	optional int32 alarm_logo_cycle_number = 14;
+	optional int32 alarm_logo_attachment_number = 15;
+}
+
+message AdasEventInfo{
+    optional int32 adas_alarm_id =1;
+    optional int32 adas_flag_state = 2;
+    optional int32 adas_alarm_or_event_type = 3;
+    optional int32 adas_alarm_level = 4;
+    optional int32 adas_front_vehicle_speed = 5;
+    optional int32 adas_front_veh_or_ped_dis = 6;
+    optional int32 adas_yaw_type = 7;
+    optional int32 adas_road_sign_type = 8;
+    optional int32 adas_road_sign_data = 9;
+	optional int32 adas_vehicle_speed = 10;
+	optional int32 adas_elevation = 11;
+	optional double adas_latitude = 12;
+	optional double adas_longitude = 13;
+	optional string adas_date_time = 14;
+	optional string adas_vehicle_state = 15;
+	optional string adas_alarm_logo_terminal_id = 16;
+	optional string adas_alarm_logo_alarm_time = 17;
+	optional int32 adas_alarm_logo_no = 18;
+	optional int32 adas_alarm_logo_attachments_numbers = 19;
+}
+
+message BlindAreaMonitor{
+    optional int32 alarm_id =1;
+    optional int32 flag_state = 2;
+    optional int32 alarm_type = 3;
+    optional int32 vehicle_speed = 4;
+    optional int32 elevation = 5;
+    optional double latitude = 6;
+    optional double longitude = 7;
+    optional string date_time = 8;
+    optional string vehicle_state = 9;
+	optional string alarm_logo_terminal_id = 10;
+	optional string alarm_logo_alarm_time = 11;
+	optional int32 alarm_logo_no = 12;
+	optional int32 alarm_logo_attachments_numbers = 13;
+}
+
+message EsVehicleWorkStateInfo{
+    optional string channel_state = 1;
+    optional int32 channel1 = 2;
+    optional int32 channel2 = 3;
+    optional int32 channel3 = 4;
+    optional int32 channel4 = 5;
+    optional int32 channel5 = 6;
+    optional int32 channel6 = 7;
+    optional int32 channel7 = 8;
+    optional int32 channel8 = 9;
+    optional int32 channel9 = 10;
+}
+
+message EatonInfo{
+    optional int32 run_mode = 1;
+    optional int32 dcdc_state_eaton = 2;
+    optional double gear_poton = 3;
+    optional double wislresist = 4;
+    optional double main_motor_count = 5;
+    optional double main_motor_nuber = 6;
+    optional double max_voltl_elec_suyem_num = 7;
+    optional double mix_voltl_elec_suyem_num = 8;
+    optional double max_temp_suyem_num = 9;
+    optional double min_temp_suyem_num = 10;
+}
+
+
+

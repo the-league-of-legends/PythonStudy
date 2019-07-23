@@ -1,0 +1,67 @@
+__author__ = 'zouhl'
+from yt_base import YTHbase, YTRedis, YTPhoenix
+from config import global_param
+from collections import OrderedDict
+
+
+def _send_rpc_msg(rpc_msg_q, msg):
+    import pickle
+    rpc_msg_q.put(pickle.dumps(msg))
+
+
+def query_phoenix_data(rpc_msg_q, rpc_terminate, sql):
+    result = []
+    phoenix = YTPhoenix(global_param.test_env['3.0']['phoenix_server'])
+    all_data = phoenix.query_fetchmany(sql)
+
+    header = OrderedDict()
+
+    for key in all_data[0]:
+        header[key] = len(key)
+
+    for each in all_data:
+        for key in header:
+            if len(str(each[key])) > header[key]:
+                header[key] = len(str(each[key]))
+
+    title = ''
+    for key in header:
+        item = '%(key)-{}s'.format(header[key]+5) % {'key': key}
+        title += item
+
+    result.append('=' * len(title))
+    result.append(title)
+    result.append('-' * len(title))
+    for each in all_data:
+        line_value = ''
+        for key in header:
+            if each[key] is None:
+                value = '-'
+            else:
+                value = each[key]
+            item = '%(value)-{}s'.format(header[key]+5) % {'value': value}
+            line_value += item
+        result.append(line_value)
+    result.append('=' * len(title))
+    return result
+
+
+def query_redis_data(rpc_msg_q, rpc_terminate, client_id, express):
+    redis = YTRedis(global_param.test_env['3.0']['redis_server'])
+    tmp = express.strip().split(' ')
+    if len(tmp) != 2:
+        _send_rpc_msg(rpc_msg_q, 'Express is not correct')
+        return []
+
+    key = tmp[0]
+    value = tmp[1]
+    result = []
+
+    if hasattr(redis, key):
+        result.append('=' * 50)
+        result.append(eval('redis.' + key)(value))
+        result.append('=' * 50)
+        return result
+    else:
+        _send_rpc_msg(rpc_msg_q, 'Express is not supported')
+        return []

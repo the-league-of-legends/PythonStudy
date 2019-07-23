@@ -1,0 +1,377 @@
+__author__ = 'zouhl'
+import json
+import os
+
+'''
+===================================================================
+=====================       YTRedis        ========================
+===================================================================
+'''
+try:
+    import rediscluster
+except:
+    raise ImportError("缺少扩展包redis-py-cluster")
+
+
+class YTRedis(object):
+    def __init__(self, redis_nodes):
+        startup_nodes = []
+        for each in str(redis_nodes).split(","):
+            redis_node = dict()
+            host = each.split(":")[0].strip()
+            port = each.split(":")[1].strip()
+            redis_node["host"] = host
+            redis_node["port"] = port
+            startup_nodes.append(redis_node)
+        self.rc = rediscluster.StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+
+    def set(self, key, value):
+        self.rc.set(key, value)
+
+    def get(self, key):
+        return self.rc.get(key)
+
+    def delete(self, key):
+        self.rc.delete(key)
+
+    def hgetall(self, name):
+        return self.rc.hgetall(name)
+
+    def hget(self, name, key):
+        return self.rc.hget(name, key)
+
+    def hset(self, name, key, value):
+        self.rc.hset(name, key, value)
+
+    def hdel(self, name, key):
+        self.rc.hdel(name, key)
+
+    def keys(self, pattern):
+        return self.rc.keys(pattern=pattern)
+
+'''
+===================================================================
+=====================       YTRabbitMQ     ========================
+===================================================================
+'''
+try:
+    import pika
+except:
+    raise ImportError("缺少扩展包pika")
+
+
+class YTRabbitMQ(object):
+    def __init__(self, host, username, password, port=5672):
+        if pika.__version__ > "0.10.0":
+            pika.ConnectionParameters.DEFAULT_CREDENTIALS.username = username
+            pika.ConnectionParameters.DEFAULT_CREDENTIALS.password = password
+        else:
+            pika.ConnectionParameters.DEFAULT_USERNAME = username
+            pika.ConnectionParameters.DEFAULT_PASSWORD = password
+        param = pika.ConnectionParameters(host=host, port=port)
+        conn = pika.BlockingConnection(param)
+        # conn = pika.BaseConnection(param)
+
+        self.mq = conn.channel()
+
+    def get_message(self, queue, count=1):
+        msg_list = []
+        index = 0
+
+        method_frame, header_frame, body = self.mq.basic_get(queue)
+
+        while method_frame:
+            msg = body.decode()
+            msg_list.append(msg)
+            self.mq.basic_ack(method_frame.delivery_tag)
+            if count == 1:
+                return msg
+
+            index += 1
+            if index >= count:
+                break
+            method_frame, header_frame, body = self.mq.basic_get(queue)
+
+        return msg_list
+
+    def get_all_message(self, queue):
+        # msg_list = []
+        method_frame, header_frame, body = self.mq.basic_get(queue)
+
+        while method_frame:
+            yield body.decode()
+            # msg_list.append(msg)
+            self.mq.basic_ack(method_frame.delivery_tag)
+            method_frame, header_frame, body = self.mq.basic_get(queue)
+        # return msg_list
+
+    def publish_a_message(self, exchange, msg, routing_key=None):
+        if routing_key is None:
+            routing_key = exchange
+        self.mq.basic_publish(exchange=exchange, routing_key=routing_key, body=msg)
+
+    def purge(self, queue):
+        self.mq.queue_purge(queue)
+
+    def create_a_queue(self, queue, exchange=None):
+        self.mq.queue_declare(queue, auto_delete=True)
+        if exchange is not None:
+            self.mq.queue_bind(queue, exchange, routing_key=exchange)
+
+    def delete_a_queue(self, queue):
+        self.mq.queue_delete(queue)
+
+    def close(self):
+        self.mq.close()
+
+'''
+===================================================================
+=====================       YTKafka        ========================
+===================================================================
+'''
+try:
+    from kafka import KafkaProducer
+    from kafka import KafkaConsumer
+except:
+    raise ImportError("缺少扩展包kafka")
+
+
+class YTKafkaProducer(object):
+    def __init__(self, servers, topic=None):
+        bootstrap_servers = []
+        for each in str(servers).split(","):
+            bootstrap_servers.append(each.strip())
+
+        self.producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
+        self.topic = topic
+
+    def send_data(self, data, topic=None):
+        if topic is None:
+            topic = self.topic
+        self.producer.send(topic, data)
+
+    def flush(self):
+        self.producer.flush()
+
+
+class YTKafkaConsumer(object):
+    def __init__(self, servers, topic, group_id='test', consumer_timeout_ms=120000):
+        bootstrap_servers = []
+        for each in str(servers).split(","):
+            bootstrap_servers.append(each.strip())
+
+        self.consumer = KafkaConsumer(
+            topic,
+            bootstrap_servers=bootstrap_servers,
+            group_id=group_id,
+            consumer_timeout_ms=consumer_timeout_ms)
+
+    def consume_data(self):
+        try:
+            for message in self.consumer:
+                yield message.value
+        except KeyboardInterrupt as e:
+            print(e)
+
+    def close(self):
+        self.consumer.close()
+
+
+'''
+===================================================================
+=====================       YTHbase        ========================
+===================================================================
+'''
+import happybase
+
+
+class YTHbase(object):
+    def __init__(self, server):
+        self.conn = happybase.Connection(server)
+
+    def get_row_data(self, table_name, rowkey, family=None):
+        table = self.conn.table(table_name)
+        row_data = table.row(rowkey)
+        if family is None:
+            return row_data
+        return row_data[str(family).encode()]
+
+    def scan_row_data(self, table_name, rowkey, family=None):
+        row_start = rowkey + '00'
+        row_stop = rowkey + '99'
+        table = self.conn.table(table_name)
+        for row_data in table.scan(row_start, row_stop):
+            if family is None:
+                return row_data
+            return row_data[str(family).encode()]
+
+
+
+'''
+===================================================================
+=====================          YTES        ========================
+===================================================================
+'''
+from elasticsearch import Elasticsearch
+
+
+class YTES:
+    def __init__(self, host, port=9200):
+        self.es = Elasticsearch(host, port=port)
+
+    def get(self, index, doc_type, id_):
+        return self.es.get(index=index, doc_type=doc_type, id=id_)
+
+    # modified by zhangp [2018-12-6]
+    def delete(self, index, doc_type, id_):
+        return self.es.delete(index=index, doc_type=doc_type, id=id_)
+
+    def search(self, index, body):
+        return self.es.search(index=index, body=body)
+
+    # modified by zhangp [2018-12-6]
+    def delete_by_query(self, index, body):
+        self.es.delete_by_query(index=index, body=body)
+
+
+
+
+'''
+===================================================================
+=====================          PHEONIX        =====================
+===================================================================
+'''
+import phoenixdb
+import phoenixdb.cursor
+
+
+class YTPhoenix:
+    def __init__(self, host, port=8765):
+        database_url = 'http://{0}:{1}/'.format(host, port)
+        conn = phoenixdb.connect(database_url, autocommit=True)
+        self.cursor = conn.cursor(cursor_factory=phoenixdb.cursor.DictCursor)
+        self.map_field = self._load_map_file()
+
+    def _load_map_file(self):
+        map_file = r'yt_base\phoenix_map\phoenix_map'
+        field_map = dict()
+        with open(map_file) as mf:
+            for line in mf:
+                if not line:
+                    continue
+                protocol, field_name, column_name = line.strip().upper().split('|')
+                if protocol not in field_map:
+                    field_map[protocol] = dict()
+
+                field_map[protocol][column_name] = field_name
+
+        return field_map
+
+    def _sql_parse(self, sql):
+        words = []
+        word = ''
+        tail = False
+        for c in sql:
+            if c in (" ", ",", "'", "(", ")", "=", "+", "-", ";", "\n"):
+                if word:
+                    words.append(word)
+                word = ''
+                words.append(c)
+                tail = True
+            else:
+                word += c
+                tail = False
+
+        if not tail:
+            words.append(word)
+
+        return words
+
+
+    def _map_sql(self, sql, table_name):
+        protocol = table_name[3:].upper()
+        if protocol not in self.map_field:
+            return sql
+
+        table_field_map = self.map_field[protocol]
+        new_sql = ''
+        parsed_sql = self._sql_parse(sql)
+        parsed_sql_upper = []
+
+        for each in parsed_sql:
+            parsed_sql_upper.append(each.upper())
+
+        for field in table_field_map:
+            if table_field_map[field] in parsed_sql_upper:
+                index = parsed_sql_upper.index(table_field_map[field])
+                parsed_sql[index] = field
+
+        for each in parsed_sql:
+            new_sql += each
+
+        return new_sql
+
+    def _map_result(self, result, table_name):
+        protocol = table_name[3:].upper()
+        if protocol not in self.map_field:
+            return result
+
+        table_field_map = self.map_field[protocol]
+        result_mapped = dict()
+
+        for each in result:
+            if each in table_field_map:
+                result_mapped[table_field_map[each]] = result[each]
+            else:
+                result_mapped[each] = result[each]
+
+        return result_mapped
+
+    def _map_result_list(self, result_list, table_name):
+        mapped_result_list = []
+        for result in result_list:
+            mapped_result_list.append(self._map_result(result, table_name))
+
+        return mapped_result_list
+
+    def query(self, sql):
+        sql = sql.strip()
+        table_name = sql[sql.upper().find('TF_'):].split(' ')[0]
+        sql = self._map_sql(sql, table_name)
+        self.cursor.execute(sql)
+        return self._map_result(self.cursor.fetchone(), table_name)
+
+    def query_fetchmany(self, sql):
+        sql = sql.strip()
+        table_name = sql[sql.upper().find('TF_'):].split(' ')[0]
+        sql = self._map_sql(sql, table_name)
+        self.cursor.execute(sql)
+        if 'limit' in sql:
+            return self._map_result_list(self.cursor.fetchmany(), table_name)
+        else:
+            return self._map_result_list(self.cursor.fetchmany(10), table_name)
+
+if __name__ == '__main__':
+    p = YTPhoenix('10.66.221.166')
+    r = p.query_fetchmany("select * from tf_fault limit 10")
+
+    # col = [
+    #     "id","MessageID","sim_no","device_id","device_no","device_vin","device_ln","device_sn","terminal_id","buss","org_id","row_create_time","device_category","old_device_id","real_terminal_id","AbsElectricSolenoidValveClose","AbsElectricSolenoidValveCloseCount","AbsElectricSolenoidValveOpen","AbsElectricSolenoidValveOpenCount","ABSPackageNo","ABSState","AbsWorkState","ABS_Active","ACArefactionSwitch","AcceleratorPedalPosition","AcCfRotationRate","ACCompCryogenPressure_HW","AcCompressorActualSpeed","AcCompressorSwitch","ACCondFanSpeedPercent","AcCoolingSwitch","AccPedalApt","AccPedalAptPureElec","AccPedalEffectSignal","AccPedalVoltage","AccState","ACDisinfectSwitch","AcElectricHeatingSwitch","ACEvapFanSpeedPercent","ACEvapTempRightCore_HW","ACFaultInfo","ACFreshAirStatus_HW","ACFreshAirSwitch","AcHeatingSwitch","ACInputBusVol","AcIntsideTemp","AcIntsideTempC1","AcOutputCurrent","AcOutputVolt","AcOutsideTemp","AcOutsideTempC1","AcPanelSettingTemp","AcPanelSettingTempAbroad","AcPanelSettingTemp_HW","ACPressureSwitch","AcSingleElecConsumption","AcSystemSwitch","ACSystemVoltageHight_HW","ACSystemVoltageLow_HW","AcTotalElecConsumption","ActualDriverMode_HW","ActualGears_HW","ActualRespPower","ActualSpeed_HW","ActualSteeringAngle_HW","ActualStopCarBrakeGears_HW","ActualSubSpeed_HW","ACVoltage_HW","ACWindGear","ACWorkMode","ACWorkStatus_HW","AfterprocessingFlueInjectionRate","AfterprocessingModuleDTCDefect","AfterTheDoorsOpen","AirCndtrAutoState","AirCndtrState","AirCndtrStopSignal","AirCndtrVentilateState","AirCompressorSingleElecConsumption","AirCompressorTotalElecConsumption","AirConditionCompressorWorkState","AirConditionControl","AirCprsFaultCode","AirCprsFaultLevel","AirFilterLightEx","airtubePressure","airtubeTemperature","AlarmSignalFuG","alarm_state","Altitude","AngularVelocity","AntiClippingState","AntiScratchMode_HW","AntiScratchSteps_HW","AntiScratch_HW","AsrElectricSolenoidValveClose","ASRIndicator","AutomaticCompressCount_HW","AutomaticDriveSettingSpeed","AutomaticDrivingMode","AverageGasEconomy","AvoidanceTips","BackBrakeAirPressure","BackCarLightStatus_HW","BackCloseDownSignal","BackDoorLocation_HW","BackDoorSignal","BackDoorState","BackDoorSwitch_HW","BackFogLampEx","BackFogLampW","BackStartSignal","BalanceAlarmStatus","BalanceStatus","BarometricPressure","BatteryAspectCurrent","BatteryAspectVoltage","BatteryCapacitySOC","BatteryChargState","BatteryGroupOverVoltageAlarm","BatteryGroupUndervoltageAlarm","BatteryManufacturer","BatteryTerminalState","BatteryType","BatteryUndervoltageAlarm","BeidouUsingState","BigBoxBlowdownSwitch_HW","BigBoxElectricPushRod_HW","BigBoxLift_HW","BigBoxWorkState_HW","BilgeTankOverAlarm_HW","BlowHeadOrBlowFoot_HW","BlowingMode","BmsAirConditionControl","BmsChargeMode","BMSCtrlChargeCurrent","BMSCtrlChargeVolt","BMSDischargeContactorStatus","BMSHeatManageRelayState","BMSPreheatingSwitch","BMSPreheatingTime","BMSPreheatingType","BMSProgramVerInfo","BMSReqSettingMode","BMSWaterTemp","BoardChangeCoolingState","BothwayDCDCChgrWorkState","BothwayDCDCInPower","BothwayDCDCOutPower","BothwayDCDCWorkState","BottleNeckState","BoxBuzzer_HW","BoxLocation_HW","BoxSprinklerValve_HW","BrakeAir1Pressure","BrakeAir2Pressure","BrakeAirPrsAlarm","BrakeDeceleration","BrakeLightControlStatus","BrakeLightSignal","BrakeLightSignal2","BrakeLightStatus_HW","BrakeLockOutputDiagnosticState","BrakePadsWear","BrakePedalApt","BrakePedalAptPureElec","BrakePedalCondition_HW","BrakePedalPosition","BrakePedalVoltage","BrakeRequestValidity","BrakeShoeWornAlarm","BrakeSignal","BrakeState","BrakeSwitchState_HW","BrushRotateControlPattern_HW","BrushRotateSpeedControl_HW","BrushRotateStallControlPattern_HW","BtyAveSigStrength","BtyCapacitySOH","BtyChrg","BtyCurrentFuG","BtyDefectDetect","BtyDisChrg","BtyEqualAlarmFuG","BtyFactorySigStrength","BtyHealthDegree","BtyHighVolNegaIslRst","BtyHighVolPosiIslRst","BtyManageSysState","BtyModuleNum","BtyMonomerCnt","BtyPackModuleNum","BtySeriousHighTmptBoxNumber","BtySigStrengthAndAveSum","BtySOCFuG","BtySulfationDetect","BtySysIslRst","BtySysRatedCapacity","BtySysRatedConsumption","BtyTemp","BtyTmptFeelerCnt","BtyTotalCurrent","BtyTotalVoltage","BtyVoltageFuG","BusCurrent","BusVoltage","BuzzerEarlyWarning","CameraFault","CANBusStateMonitorData","CANGroup01AverageFuelConsumptionRate","CANGroup01CumminsSecondaryBatteryVoltage","CANGroup01DataListSize","CANGroup01EBSBrakeSwitch","CANGroup01EngineAuxiliaryShutdownSwitch_18","CANGroup01EngineAuxiliaryShutdownSwitch_7","CANGroup01EngineCoolantTemperature","CANGroup01EngineOilPressure","CANGroup01EngineRetarderSelection","CANGroup01EngineSpeed","CANGroup01InletManifoldTemperature","CANGroup01InletPressure","CANGroup01InstantaneousFuelConsumptionRate","CANGroup01ISCMediumSpeedControl","CANGroup01MILLightStatus","CANGroup01OilPressureSignal","CANGroup01OilTemperature","CANGroup01PercentageOfCurrentSpeedLoad","CANGroup01PreheatLightStatus","CANGroup01RemoteThrottleEnableSwitch","CANGroup01RiverBellSecondaryBatteryVoltage","CANGroup01ThrottleInterlockSwitch","CANGroup01TotalEngineOilConsumption","CANGroup01TotalEngineOperationTime","CANGroup01VehicleThrottleControl","CANGroup02AverageFuelConsumptionRate","CANGroup02CumminsSecondaryBatteryVoltage","CANGroup02DataListSize","CANGroup02EBSBrakeSwitch","CANGroup02EngineAuxiliaryShutdownSwitch_18","CANGroup02EngineAuxiliaryShutdownSwitch_7","CANGroup02EngineCoolantTemperature","CANGroup02EngineOilPressure","CANGroup02EngineRetarderSelection","CANGroup02EngineSpeed","CANGroup02InletManifoldTemperature","CANGroup02InletPressure","CANGroup02InstantaneousFuelConsumptionRate","CANGroup02ISCMediumSpeedControl","CANGroup02MILLightStatus","CANGroup02OilPressureSignal","CANGroup02OilTemperature","CANGroup02PercentageOfCurrentSpeedLoad","CANGroup02PreheatLightStatus","CANGroup02RemoteThrottleEnableSwitch","CANGroup02RiverBellSecondaryBatteryVoltage","CANGroup02ThrottleInterlockSwitch","CANGroup02TotalEngineOilConsumption","CANGroup02TotalEngineOperationTime","CANGroup02VehicleThrottleControl","CANGroupDataListSize","CanPanelPowerSupply_HW","CanPanelStop_HW","CanProtoVersion","CapacitanceTerminalState","CapHighVolNegaIslRst","CapHighVolPosiIslRst","CapManageSysState","CapMaxVoltElecCoreNum","CapMinVoltElecCoreNum","CapSglOverVoltAlmModuleNum","CapSysIslRst","CapSysSglVoltDiff","CarAirQualityStatus","CarChargerOutPower","CarCrossrangeSpeed_HW","CarHeatingMode","CarOutsideTemperatureSensorFault_HW","CartwheelAlarm","CarYawSpeed_HW","cascophen_in_vehicle","CatalystLevelAltitude","ChangeTrackTips","ChannelBrush_HW","ChargeCtrlBits","ChargePlugConnState","ChargerCommunicationAlarm","ChargerOutCurrent","ChargerOutVoltage","ChargerTempt","ChargeSocketTemptFstN","ChargeSocketTemptFstP","ChargeSocketTemptSndN","ChargeSocketTemptSndP","ChargingIndicator1","ChargingIndicator2","ChargingIndicator3","check_can_fault","ChrgCurrentLimit","ChrgrNum","ChrgState","ChrgState2","CircuitSelfFault_HW","CircuitState","ClearCautionLightStatus_HW","ClearMode_HW","CloseButtonSignal","Clutch","ClutchState_JYD","ClutchSwitchState_HW","CMCSSwitchState","CMCSValue","CNTCounter","co2_in_vehicle","CollisionAlarm","CollisionAlarms","CollisionWarningLevel","CommunicationLifeCycleCounter","CompressionBoxState_HW","CompressionState_HW","CompressorMessageAbnormal_HW","CompressorMessageLose_HW","CompressorOvervoltageFault_HW","CompressorUndervoltageFault_HW","CondensingFanFault_HW","CondensingSensorFault_HW","ContactorCtrlFuG","ControllerHeartbeatPackage_HW","ControlSystemHitch","ControlUnitSpeed","CoolingFan_HW","CoolingWaterPump_HW","CoolWtrConductivity","CoolWtrLvlState","CruiseControlEnabling_HW","CruiseControlSetSpeed_HW","CruiseControlState_HW","CruisingControlActivation_HW","CtiireStatus","CtiWheelEndElectricalFault","CtiWheelSensorStatus","CumulativeDrivingTimeout","CumulativeWeight_HW","CurrentAveSigStrength","CurrentMeasureRange","CurrentOfFC","CurrentResolution","CurrentSigStrength","currentSpeedLoadPercentage","CurrentSpeedOfPumpMotor_HW","CushionOutput","DbgStateSignal","DCDC1FaultCode","DCDC1FaultLevel","DCDC2FaultCode","DCDC2FaultLevel","DCDCOutCurrent","DCDCOutCurrent_2","DcdcOutVolt","DcdcOutVolt_2","DCDCSingleElecConsumption","DCDCTempt","DCDCTempt_2","DCDCTempt_24V","DCDCTotalElecConsumption","DCDCWorkState","DCDCWorkState_2","DecelerationRequestValidity","DefrostSingleElecConsumption","DefrostTotalElecConsumption","Defrost_HW","DeodorantButSwitch_HW","DeodorantControl_HW","DeodorizerAlarmSignal_HW","DICOCommFault","Dippedheadlight","DippedheadlightEx","DirectionRunningStatus","DischrgCurrentLimit","DisChrgEnd","DisinfectionStatus_HW","DoorBrakingWorkMode","DoorEmergencySwitch","DoorFault_HW","DoorLockState","DoorLongTimeNotClose_HW","DoorState","DoorState_HW","DoubleFlashLampW","DpfState","DriverAreaAC","DriveRequirementTorque","DrivingMode","DrivingRange","DrivingSeatDoorState","driving_range","DrvrOrderTorqPercent","Eaton12VBtyLowVolAlarm","EatonBrakeState","EatonBtyCurrent","EatonBtyOverTemptAlarm","EatonBtyOverVolAlarm1","EatonBtyOverVolAlarm2","EatonBtyTempreture","EatonBtyVoltage","EatonCurGearCount","EatonHandBrake","EatonHybridState","EatonInsResistLowAlarm","EatonMotorCtrlerTempt","EatonMotorOverTemptAlarm","EatonMotorRotateSpeed","EatonOutputShaftSpeed","EatonPECHeatingEnable","EatonSOC","EatonVehicleSpeed","EBSABSActivateSignal","EBSBrakeDegree","EBSBrakeSwitch","EBSDriveTorqueMode","EBSElcTorquePercent","EBSOutDriveTorquePercent","EBSRedIndicator","EBSRedLightFault","EBSYellowIndicator","EBSYellowLightFault","ElectFan10NoBrushFaultState","ElectFan11NoBrushFaultState","ElectFan12NoBrushFaultState","ElectFan1FaultStateModule1","ElectFan1FaultStateModule2","ElectFan1NoBrushFaultState","ElectFan2FaultStateModule1","ElectFan2FaultStateModule2","ElectFan2NoBrushFaultState","ElectFan3FaultStateModule1","ElectFan3FaultStateModule2","ElectFan3NoBrushFaultState","ElectFan4FaultStateModule1","ElectFan4FaultStateModule2","ElectFan4NoBrushFaultState","ElectFan5FaultStateModule1","ElectFan5FaultStateModule2","ElectFan5NoBrushFaultState","ElectFan6FaultStateModule1","ElectFan6FaultStateModule2","ElectFan6NoBrushFaultState","ElectFan7NoBrushFaultState","ElectFan8NoBrushFaultState","ElectFan9NoBrushFaultState","ElectFanNoBrushAmount","ElectFanNoBrushInterCoolAmount","ElectFanNoBrushSysModeModule","ElectFanNoBrushSystemFaultCode","ElectFanNoBrushWaterTempAmount","ElectFanSysFaultCodeModule1","ElectFanSysFaultCodeModule2","ElectFanSysModeModule1","ElectFanSysModeModule2","ElectFanWorkingMode","ElectFanWorkingMode2","ElectricDischarge","ElectricHeatingPostTotalPower51","ElectricHeatingRevrTotalPower51","ElectricHeatingSingleElecConsumption","ElectricHeatingThePostTotalPower51","ElectricHeatingTheRevrTotalPower51","ElectricHeatingTotalElecConsumption","ElectricizeAlarm","ElectricRemovingFrostSignal","ElectricSteeringMode","ElectronicDeceleration","ElectronicDecelerationEffectiveness","ElectronicFanDissipateHeat_HW","ElectronicParkingAsrCount","ElectronicParkingCondition","EltricVehicleType","EmergencyState","EmergencyStopBut_HW","EmergencySwitch","EncryptionState","EnduranceMileage","EngineAccumulatedRunRpm","EngineAccumulatedRunTime","EngineActualTorque","EngineAverageFuelEconomy","EngineBrakeLamp_HW","EngineCoolingWaterTemperature","EngineFuelRate","EnginefuelTemperature","EngineHatch","EngineHatchEx","EngineInstantaneousFuelEconomy","EngineIntercoolerTemperature","EngineOilTemperature","EngineRequiredSpeed","Enginespeed","EngineTorquePercentage_HW","EngineTotalFuelUsed","EngineTripFuel","EngineTurbochargerOilTemperature","Enginevelocity","EpbSystemStatus","EPSDrivingState","EPSFaultInformation","EPSSteeringWheelAngle","ESCLateralAcceleration","ESCLongitudinalAcceleration","ESCParkingControlRequest","ESCPressureRequestIdentifier","ESPIndicator","EvaporatorFanFault_HW","EvaporatorSensorFaultLeft_HW","EvaporatorSensorFaultRight_HW","ExchangeChargeMode","ExhaustBrakeLamp_HW","ExhaustPressure","ExhaustTemp_T1","ExhaustTemp_T2","ExhaustTemp_T3","ExhaustTemp_T4","ExternalChrgDetect","FailureOfCompressionMechanism_HW","FanRunSwitchFuG","FatigueDrivingAlarm","FatigueDrivingWarning","Fault272829ModuleNum","FaultCode","FaultDevAddr","FaultInfomation_HW","FaultLevel","FCCurrent","FCRunning","FCStarting","FCStopped","FCStopping","FCVol","FCWaterTempt","FE_CurrentSpeedMotor_HW","FE_HighPressureElectric_HW","FE_MotorControlBusbarCurrent_HW","FE_MotorControlBusbarVoltage_HW","FE_MotorControlOutputPower_HW","FE_MotorControlPositiveSinglePower_HW","FE_MotorControlPositiveSumPower_HW","FE_MotorControlTemperature_HW","FE_MotorOutputTorque_HW","FE_MotorSpeed_HW","FE_MotorSwitchState_HW","FE_MotorTargetSpeed_HW","FE_MotorTemperature_HW","FE_No2MotorControlBusbarCurrent_HW","FE_No2MotorControlBusbarVoltage_HW","FE_No2MotorControlOutputPower_HW","FE_No2MotorControlPositiveSinglePower_HW","FE_No2MotorControlPositiveSumPower","FE_No2MotorControlTemperature_HW","FE_No2MotorOutputTorque_HW","FE_No2MotorSpeed_HW","FE_No2MotorTargetSpeed_HW","FE_No2MotorTemperature_HW","FE_No3MotorControlBusbarCurrent_HW","FE_No3MotorControlBusbarVoltage_HW","FE_No3MotorControlPositiveSinglePower_HW","FE_No3MotorControlPositiveSumPower_HW","FE_No3MotorControlTemperature_HW","FE_No3MotorOutputTorque_HW","FE_No3MotorSpeed_HW","FE_No3MotorTargetSpeed_HW","FE_No3MotorTemperature_HW","FE_No4MotorControlBusbarCurrent_HW","FE_No4MotorControlBusbarVoltage_HW","FE_No4MotorControlPositiveSinglePower_HW","FE_No4MotorControlPositiveSumPower_HW","FE_No4MotorControlTemperature_HW","FE_No4MotorOutputTorque_HW","FE_No4MotorSpeed_HW","FE_No4MotorTargetSpeed_HW","FE_No4MotorTemperature_HW","FillerActionSwitch_HW","FillerAction_HW","FillerDownCloseSignal_HW","FillerDownSolenoidValve_HW","FillerLockStopSwitch_HW","FillerUpSolenoidValve_HW","Filler_HW","ForceDriveSignal","frictionTorquePercentage","FrontAxlePressureSensor","FrontBrakeAirPressure","FrontDoorFault_HW","FrontDoorSignal","FrontDoorState","FrontDoorState_HW","FrontFogLamp","FrontFogLampW","FrontLeftBrushLift_HW","FrontLeftBrushRotate_HW","FrontObstacleRelativeLateralDistance","FrontObstacleRelativeLongDistance","FrontObstacleRelativeSpeed","FrontRightBrushRotate_HW","FrontRightBrushUpDwon_HW","FuelBtyAvgSglVoltage","FuelBtyFaultCode","FuelBtyFaultLevel","FuelBtyMaxSglVolNum","FuelBtyMaxSglVoltage","FuelBtyMinSglVolNum","FuelBtyMinSglVoltage","FuelBtyPileOneWayUptime","FuelBtyPower","FuelCellVehicleFailure","FuelconsumptionRate","FuelEconomyRate","FuelLevel","GalileoUsingState","GarbageBoxFullAlarm_HW","GarbageBoxOver_HW","GarbageCleaningSteps_HW","GarbageCleaning_HW","GarbageCleanSwitch_HW","GasConsumption_ECI","GasConsumption_ESI","GasConsumption_WC","GasFillPortState","GasValveState","GearBox","GearInfo","GearPosition","GeneralResponse_HW","GetOffRequest","GlonassUsingState","GnssAntennaDisconnect","GnssAntennaShortCircuit","GnssModuleFault","GoToChargingPileState","GPSDirection","GpsLatValid_5m","GpsLatZone_5m","GpsLat_5m","GpsLotValid_5m","GpsLotZone_5m","GpsLot_5m","GpsState","GpsUsingState","HandBrake","HandBrakeEx","HeadLightStatus_HW","HeartbeatSign","HeaterState","HeaterWaterLightState","HeaterWaterMainEngineLightState","HeatingRelayStatus","HighPressureLeakageAlarm","HighPrsGashldrHydPrs","HighPrsGashldrHydTempt","HighResolutionTotalVehiclDistance","HighResolutionTripDistance","HighSOCAlarmFuG","HighTemptAlarmFuG","HightSelfCleaaingWaterValue_HW","HightSprayGunWaterValue_HW","HightSprayWaterValue_HW","HightWaterPumpClutch_HW","HighVolFaultAlarm","HighVolRequest","HighVoltageMainRelayState","HigTemperature","HigTemperatureAlarm","HigTemperatureStatus","HigthBeam","HigthBeamEx","hitchbitHW","hitchbit_code_18A70017_IE102","hitchbit_code_18A70017_IE103","hitchbit_code_18A70017_IE10A","hitchbit_code_18A70017_P0196YT","hitchbit_code_18FFF117_IA1011","hitchbit_code_18FFF117_IA1021","hitchbit_code_18FFF117_IA1031","hitchbit_code_18FFF117_ID1020","hitchbit_code_18FFF117_ID1021","hitchbit_code_18FFF117_IE1021","hitchbit_code_18FFF117_IE1031","hitchbit_code_18FFF117_IE1041","hitchbit_code_18FFF117_IE1051","hitchbit_code_18FFF117_IH1011","hitchbit_code_18FFF117_IL1011","hitchbit_code_18FFF117_IL1021","hitchbit_code_18FFF117_IL1031","hitchbit_code_18FFF117_IL1041","hitchbit_code_18FFF117_IL1051","hitchbit_code_18FFF117_IL1061","hitchbit_code_18FFF117_IL1071","hitchbit_code_18FFF117_IL1081","hitchbit_code_18FFF117_IL1091","hitchbit_code_18FFF117_IM1011","hitchbit_code_18FFF117_IM1021","hitchbit_code_18FFF117_IM1031","hitchbit_code_18FFF117_IM1041","hitchbit_code_18FFF117_IM10A1","hitchbit_code_18FFF117_IR1011","hitchbit_code_18FFF117_IS1021","hitchbit_code_18FFF117_IV1011","hitchbit_code_18FFF117_IV1021","hitchbit_code_18FFFA17_IA108","hitchbit_code_18FFFA17_ID101","hitchbit_code_18FFFA17_IF101","hitchbit_code_18FFFA17_IL10A","hitchbit_code_18FFFA17_IL10B","hitchbit_code_18FFFA17_IL10C","hitchbit_code_18FFFA17_IM105","hitchbit_code_18FFFA17_IM106","hitchbit_code_18FFFA17_IM107","hitchbit_code_18FFFA17_IM108","hitchbit_code_18FFFB17_IL10D","hitchbit_code_18FFFB17_IL10E","hitchbit_code_18FFFB17_IM109","hitchbit_code_18FFFB17_IS101","HitchInfoMsg","hitch_code_18EBFF00","hitch_code_18EBFF0B","hitch_code_18FECA00","hitch_code_18FECA0B","hitch_code_18FF5483","HoldFunction","HookLockCloseSignal_HW","HookLockCloseSolenoidValve_HW","HopperBlowdownSwitch_HW","HopperElectricPushRod_HW","Horn","HornSignal","humidity_in_vehicle","HwCurrentTemp","HwSurplusWater","HwSurplusWaterAlarm","HwSurplusWaterPercent","HwTempAlarmEffect","HwTempAlarmStatus","HwTempAlarmSwitch","HydBtlNeckAvgTempt","HydBtlNeckMaxTempt","HydBtlNeckMinTempt","HydMaxConsiSenserNo","HydrgnLeakSenserMaxConsi","HydrgnMaxPrsSenserNo","HydrogenFuelConsumptionRate","HydrogenHighPressure","HydrogenLowPressure","HydrogenMaxPressure","HydrogenPressureOfFC","HydrogenValveCtrlRequest","HydrogenValveSupply","HydSupplySysFaultCode","HydSupplySysFaultLevel","IBCSystemFailureState","IBCWorkingMode","IBSError","IceAndSnowMode","IdleStopingSignal","IllegalDisplacement","IllegalIgnition","IllegalOpenDoorAlarm","InletPortTempt","inletPressure","InOrOutArea","InOrOutLine","InsideTemperature","InstantGasEconomy","InstOilConsumption","InstPowerConsumption","InsulationDetectorTriggerControl","InteriorLight","IsEngineIdle","ISGMotor2Tempt","ISGMotorCtrlerActInTorque","ISGMotorCtrlerBusCurrent","ISGMotorCtrlerBusVoltage","ISGMotorCtrlerBusVoltage_283","ISGMotorCtrlMode","ISGMotorInstOutTorque","ISGMotorInstRotateSpeed","ISGMotorRotateDirection","ISGMotorTempt","ISGMotorTgtRotateSpeed","ISGMotorTgtTorque","ISGMotorTotalElecQty","ISGMotorWorkMode","IslDCDCActlOutPowerSH","IslDCDCFaultCodeSH","IslDCDCFaultLevelSH","IslDCDCFwdTotalElecQty","IslDCDCInVoltage","IslDCDCInVoltageSH","IslDCDCOnceDischElecQty","IslDCDCOutCurrentSH","IslDCDCOutVoltageSH","IslDCDCReqWorkModeSH","IslDCDCRespReqPowerSH","IslDCDCTempt","IslDCDCTemptSH","IslDCDCWorkMode","IslDCDCWorkModeSH","IslDCLowVoltEnable","IslDCPowerPedal","ISO14230DataArray","ISO15765DataArray","IsTrolleyPoleSeparated","JobMonitoringSwitch_HW","KnittingScarf_HW","LaneDepartureImminentLeftSide","LaneDepartureImminentRightSide","LaneDepartureLeft","LaneDepartureRight","LargeBoxDropDetection_HW","LargeBoxLiftingDetection_HW","LastBrushSprinklerValve_HW","LastLeftBrushRotate_HW","LastRightBrushRotate_HW","LateralAccelerationValidity","Latitude","LatitudeState","LecuCommunicationAlarm","LeftAbsorbSwitch_HW","LeftBackBrakeGasketInfo","LeftBucketWeight_HW","LeftFrontBrakeAirPressure","LeftFrontBrakeGasketInfo","LeftFrontBrushSprinklerValue_HW","LeftFrontWheelSpeed","LeftFrontWheelSpeedPulse","LeftHydrogen","LeftHydrogenPercent","LeftMotorCurrent","LeftMotorFaultCode","LeftMotorFaultLevel","LeftMotorRotateSpeed","LeftMotorTempt","LeftMotorVoltage","LeftRearBrakeAirPressure","LeftRearWheelSpeed","LeftRearWheelSpeedPulse","LeftSprayerWaterValve_HW","LeftSteeringLamp","LeftSteeringLampEx","LeftTurnLightRemainingSeconds","LeftTurnLightStatus","LeftWorkLamp_HW","LGearBacklightState","LGearWorkStatus","LiftingFault_HW","LimitedCurrent","LimitedCurrentRecvd","Line1MainCylinderPressure","Line2MainCylinderPressure","Line2PressureEffectiveLevel","LINRespError","LoadState","LockState_HW","Longitude","LongitudeState","LongitudinalAccelerationEffectiveness","LowOilPressure_HW","LowPressureAlarm_HW","LowSOCAlarmFuG","LowSOCStopAlarmFuG","LowWaterLevelAlarm","Main1DynamoControlMode","Main1DynamoRotateDirection","MainCircuitCurrentBPhase_HW","MainCircuitCurrentCPhase_HW","MainCircuitCurrent_HW","MainCircuitVoltageBPhase_HW","MainCircuitVoltageCPhase_HW","MainCircuitVoltage_HW","MainDCDCFaultCode","MainDCDCFaultLevel","MainDynamo2ControlMode_83","MainDynamo2ControlTemperature_83","MainDynamo2InstOutTorque","MainDynamo2RotateDirection_83","MainDynamo2Tachometer","MainDynamo2Temperature_83","MainDynamo2WorkMode_83","MainDynamoControlActuallyReceiveTorque_283","MainDynamoControlActuallyReceiveTorque_287","MainDynamoControlActuallyReceiveTorque_288","MainDynamoControlBusCurrent_283","MainDynamoControlBusCurrent_287","MainDynamoControlBusCurrent_288","MainDynamoControlBusVoltage_287","MainDynamoControlBusVoltage_288","MainDynamoControlMode_187","MainDynamoControlMode_188","MainDynamoControlTemperature_187","MainDynamoControlTemperature_188","MainDynamoNowOutputTorque_187","MainDynamoNowOutputTorque_188","MainDynamoNowSpeed_187","MainDynamoNowSpeed_188","MainDynamoOrderAccelerator_524","MainDynamoOrderAccelerator_624","MainDynamoRotateDirection_187","MainDynamoRotateDirection_188","MainDynamoTargetSpeed_524","MainDynamoTargetSpeed_624","MainDynamoTargetTorque_524","MainDynamoTargetTorque_624","MainDynamoTemperature_187","MainDynamoTemperature_188","MainDynamoWorkMode_187","MainDynamoWorkMode_188","MainMotorCtrlerActInTorque","MainMotorCtrlerBusCurrent","MainMotorCtrlerBusVoltage","MainMotorCtrlerTempt","MainMotorCtrlMode","MainMotorInstOutTorque","MainMotorOrderAccAptPureElec","MainMotorOrderAccAptPureElec_724","MainMotorRotateDirection","MainMotorSingleElecConsumption","MainMotorTachometer","MainMotorTemperature","MainMotorTgtRotateSpeed","MainMotorTgtTorque","MainMotorTotalElecConsumption","MainMotorWorkMode","MainPumpPressure_HW","MainSoleValveState","MaintanceDataListSize","MaintenanceInfoType","MasterCylinderStroke","MasterCylinderWtrokeValidBit","MaxBGTemptBGNoFuG","MaxBGTemptFuG","MaxCapacityLose","MaxCurrentOfFC","MaximumVoltageCycleNumber","MaxLoadPower","MaxSglVolBGNoFuG","MaxSglVolFuG","MaxTemptHydBtlNo","MaxTemptSglBtyNum","MaxTemptSglCapNum","MaxVolSglNo","MaxVoltElecCoreNum","MeterSpeed","MeterSpeedAbroad","MidBrakeAirPressure","MidCapacityDiff","MiddleDoorState","MidDoorSignal","MidVoltage","MinCapacityLose","MinimumVoltageCycleNumber","MinSglVolBGNoFuG","MinSglVolFuG","MinTemptHydBtlNo","MinTemptSglBtyNum","MinTemptSglCapNum","MinVolSglNo","MinVoltElecCoreNum","ModuleTotalVoltage","MonomerOverVoltageAlarm","MonomerUndervoltageAlarm","MonomerVoltageDifferenceAlarm","MotorAccOutput","MotorCloseDownOrder","MotorCtrlMode","MotorOilFilterAlarm","MotorOilPrsAlarm","MotorOilTemptAlarm","MotorStartControl","MotorState_HW","MotorTemperatureISG","MotorTgtRotateSpeed","MotorTgtTorque","MotorTotalOilConsumption","MultipleCompressionSteps_HW","MultipleCompression_HW","MultipleLoop_HW","MusicHorn_HW","MVCSGuidLine","MVCSVelColor","MVCSViewMode","MVCSViewSplit","NcAllVoltageHig","NcAllVoltageLow","NcBatteryAllElectricity","NcBatteryAllVoltage","NcBatteryModuleHigTemperature","NcBatteryModuleHigVoltage","NcBatteryModuleLowTemperature","NcBatteryModuleLowVoltage","NcBatteryNotTroubleMatch","NcBatterySoc","NcBatteryTemperatureHig","NcCapacitanceVoltage","NcChargeElecEnergy","NcChargeOverCurrent","NcChoppingElectricity","NcDcDcOutputElectricity","NcDcDcOutputVoltage","NcDcElectricity","NcDeviceSystemPowerConsumption","NcDeviceSystemStatusFlag","NcDischargeOverCurrent","NcDrivingBrakingPedal","NcDynamoTemperature","NcElectricLeakageAlarm","NcGridCurrent","NcGridVoltage","NcHighVoltageChargingMachineStatus","NcHigTemperatureBoxNumber","NcHigTemperatureBoxPos","NcHigVoltageBoxNumber","NcHigVoltageBoxPos","NcInsulationFaultLevel","NcLowTemperatureBoxNumber","NcLowTemperatureBoxPos","NcLowVoltageBoxNumber","NcLowVoltageBoxPos","NcModuleVoltageHig","NcModuleVoltageLow","NcMotorControlOverTemperature","NcMotorOverTemperature","NcPowerSourceVoltage","NcSocOfHig","NcSocOfLow","NcSystemInsulation1","NcSystemInsulation2","NcTemperatureNotBalance","NcTemperatureOfController","NcTroubleLevel","NcVoltageNotBalance","NetAuxSrcRockerSwitch","NeutralGearStatus_HW","NewEnergyDevAddress","NewEnergyDevHardMainVer","NewEnergyDevHardSubVerH","NewEnergyDevHardSubVerL","NewEnergyDevSoftFinalDay","NewEnergyDevSoftFinalMonth","NewEnergyDevSoftFinalYear","NewEnergyDevSoftMainVer","NewEnergyDevSoftSubVerH","NewEnergyDevSoftSubVerL","NewOnceChargeElecQty","NextStopNumber","NonIsltDCDCInCurrent","NonIsltDCDCInVol","NonIsltDCDCOutCurrent","NonIsltDCDCOutVol","NonIsltDCDCRevTgtCurrent","NonIsltDCDCState","NonIsltDCDCTgtCurrent","NonIsltDCDCWorkMode","NonIsltUpDCDCTempt","NotEnoughOrTooLong","NowConsoleMode_HW","NoxConversionEffice","NumberOfArrivalChargingPiles","NumberOfArrivalParkingSpaces","NumberOfArrivalStation","ObstacleType","Occurred272829FaultAlarmModuleNumberArray","OilAbnormal","OilAlarm","OilFilterAlarm","oilPressure","OilState","OkjMileage","OnceChargeElecQty","OnGear","OnGearEx","OpenButtonSignal","OperatingState","OutletWaterTmpture","OutputEnergy","OutsideTemperature","OverchargeState","OverCurrentFuG","OverspeedAlarm","OverspeedWaring","OvertakingTips","ParkingBrakeSwitch_HW","ParkingControlRequest","ParkingForce","ParkingTips","PavementMonitor_HW","PercentageOfGarbage_HW","PhaseDoorCloseingDetection_HW","PhaseDoorOpeningDetection_HW","pm_25_in_vehicle","PositionLampW","PositiveTotalPower","PostAcSingleElecConsumption","PostAcTotalElecConsumption","PostAirCompressorSingleElecConsumption","PostAirCompressorTotalElecConsumption","PostDCDCSingleElecConsumption","PostDCDCTotalElecConsumption","PostDefrostSingleElecConsumption","PostDefrostTotalElecConsumption","PostElecMeterTotalElecConsumption","PostElectricHeatingSingleElecConsumption","PostElectricHeatingTotalElecConsumption","PostMainMotorSingleElecConsumption","PostMainMotorSingleElecConsumption2","PostMainMotorSingleElecConsumption3","PostMainMotorSingleElecConsumption4","PostMainMotorTotalElecConsumption","PostMainMotorTotalElecConsumption2","PostMainMotorTotalElecConsumption3","PostMainMotorTotalElecConsumption4","PostSteeringSingleElecConsumption","PostSteeringTotalElecConsumption","PostTotalPowerOfFC","PostTotalPowerOfFCUpDCDC","PostTotalPowerOfSnd24VDCDC","PowerBackingPedalVoltae","PowerBatteryStatus","PowerBatteryUnderStatus","PowerBtyChrgCurrent","PowerBtyTempt","PowerBtyVoltage","PowerModeSignal","PowerSpeedPedalVoltae","PowerSupplyVolt24V","PowerSupplyVoltage","PowerVcuOut17to24","PowerVcuOut1to8","PowerVcuOut25to32","PowerVcuOut9to16","PressureSensorFault_HW","ProgramCode","ProtocolVersionFlg","ProType","PullShovelActionSwitch_HW","PullShovelAction_HW","PullShovelCloseSignal_HW","PullShovelOFFSolenoidValve_HW","PullShovelONSolenoidValve_HW","purifier_run_state","QckChgBtySOC","QckChgBtyTotalCurrent","QckChgBtyTotalVoltage","RainAndSnowMode_HW","RampAuxiliaryStartingAsrCount","RampAuxiliaryStartingState","ReachParkingSpace","ReachSiteStatus","RealtimeTemperature","RearAxlePressureSensor","RearFogLamp","RefrigerationSystemHigSwitchRight_HW","RefrigerationSystemLowSwitchLeft_HW","RemainHydQty","RemoteAirFunctionCode","ReportOfAirConditionerFaultInfoArray","RequestBtyParam","RequestESCToProvideHydraulic","Retarder","RetarderTempAlarmLamp","ReturnAirSensorFault_HW","ReturnWaterTmpture","ReverseTotalPower","ReversingSignalSwitch_HW","RevrAcSingleElecConsumption","RevrAcTotalElecConsumption","RevrAirCompressorSingleElecConsumption","RevrAirCompressorTotalElecConsumption","RevrDCDCSingleElecConsumption","RevrDCDCTotalElecConsumption","RevrDefrostSingleElecConsumption","RevrDefrostTotalElecConsumption","RevrElecMeterTotalElecConsumption","RevrElectricHeatingSingleElecConsumption","RevrElectricHeatingTotalElecConsumption","RevrMainMotorSingleElecConsumption","RevrMainMotorSingleElecConsumption2","RevrMainMotorSingleElecConsumption3","RevrMainMotorSingleElecConsumption4","RevrMainMotorTotalElecConsumption","RevrMainMotorTotalElecConsumption2","RevrMainMotorTotalElecConsumption3","RevrMainMotorTotalElecConsumption4","RevrSteeringSingleElecConsumption","RevrSteeringTotalElecConsumption","RevrTotalPowerOfFC","RevrTotalPowerOfFCUpDCDC","RevrTotalPowerOfSnd24VDCDC","RightAbsorbSwitch_HW","RightBackBrakeGasketInfo","RightBucketWeight_HW","RightFrontBrakeAirPressure","RightFrontBrakeGasketInfo","RightFrontBrushSprinklerValue_HW","RightFrontWheelSpeed","RightFrontWheelSpeedPulse","RightMotorCurrent","RightMotorFaultLevel","RightMotorRotateSpeed","RightMotorTempt","RightMotorVoltage","RightRearBrakeAirPressure","RightRearWheelSpeed","RightRearWheelSpeedPulse","RightSprayerWaterValue_HW","RightSteeringLamp","RightSteeringLampEx","RightTurnLightRemainingSeconds","RightTurnLightStatus","RightWorkLamp_HW","RiskWrning","RoadTransportCardFault","RollingBrushRotateControlPattern_HW","RollingBrushRotateSpeedControl_HW","RollingBrushRotateStallControl_HW","RotationDirectionMotor2_HW","RotationDirectionMotor_HW","RouteDeviationAlarm","RunningState","SafetyBeltAlarm","SafetyPoleDetection_HW","ScraperAction_HW","ScraperCloseSignal_HW","ScraperCloseSolenoidValve_HW","ScraperOpenSolenoidValve_HW","ScraperPressureSwitch_HW","ScrBckNoxConcentration","ScrFrtNoxConcentration","ScrState","SelfCheckingFlag","SelfLearningState","SensorLinkingState_HW","SensorTemp","SerialFault","SetingWindSpeed_HW","SetOrQueryResults","sewageFullAlarm_HW","SewageState_HW","SewageSystemFault_HW","SewageTankInspection_HW","SglAvgVol","SglBtyAvgVoltage","SglBtyMaxTempt","SglBtyMaxVoltage","SglBtyMinTempt","SglBtyMinVoltage","SglBtyVolHighAlaramFuG","SglBtyVolLowAlarmFuG","SglCapAvgVolt","SglCapMaxTempt","SglCapMaxVolt","SglCapMinTempt","SglCapMinVolt","SglMaxVol","SglMinVol","ShovelState_HW","SidewalkRGLightRemainingSeconds","SidewalkRGLightStatus","SingleCapacitorOvervoltageAlarmModuleNumberArray","SingleCompressionSteps_HW","SingleCompression_HW","SingleHydrogenConsumption","SingleLoop_HW","SingleMaxTemp","SingleMaxTempNum","SingleMaxVoltage","SingleMaxVoltageNum","SingleMileage","SingleMinTemp","SingleMinTempNum","SingleMinVoltage","SingleMinVoltageNum","SkateAction_HW","SkateCloseSignal_HW","SkateDownSolenoidValve_HW","SkateUpPressureSwitch_HW","SkateUpSolenoidValve_HW","SlowDownPrompt","SMCOutCurrent","SMCOutVoltage","SOCAdjust","SocDifferenceAlarm","SocHigAlarm","SocLowAlarm","SOCMaxRolerance","SOCMinRolerance","SOHFuG","SparepartsManufacturingNo","SparepartsOnlyNo","SparepartsProductionDay","SparepartsProductionMonth","SparepartsProductionYear","SparepartsSrcAddress","SpeedInformation","SprinklerElectricMachinery1_HW","SprinklerElectricMachinery2_HW","SprinklerElectricMachinery3_HW","SRCFrontNOxConcentration_LSB","SRCFrontNOxConcentration_MSB","SRCLastNOxConcentration_LSB","SRCLastNOxConcentration_MSB","StartOrderOfFC","StartSignal","StartSignalEx","StartStateOfFC","StateOfFC","state_value","SteerFaultCode","SteerFaultLevel","SteeringAngle","SteeringHint","SteeringSingleElecConsumption","SteeringTotalElecConsumption","SteeringWheelRotation","SteerMotorCtrlerCommFault","SteerMotorCtrlerPowerModuleTempt","SteerMotorCtrlerTempt","StopBrakingFunctionOrder","StopHold","StopHoldState","StopState_HW","StorageBtyCurrent","StorageBtyCurrent_fuel","StorageBtyModuleNum1","StorageBtyModuleNum2","StorageBtyResist","StorageBtySOC","StorageBtyVoltage","StoredEnergySysSOC","StraightLightRemainingSeconds","StraightLightStatus","StreeingWheelVibratorWarning","SuckerLocation_HW","SuctionMouthLift_HW","SuctionMouthSwitch_HW","SuctionNozzleWaterValve_HW","SuctionSprinklerValve_HW","SupCapTotalCurrent","SuperCapacitorSOC","SuperCapLowVoltEnable","SysHydrogenConcentration","SysSinglVoltDiff","SzCluthStatus","SzDynamoNowOutputRev","SzDynamoNowOutputTorque","SzDynamoTemperature","SzGears","SzGeneratorControlUnitBusCurrent","SzMainMotorNowOutputTorque","SzMainMotorNowRev","SzMainMotorStatus","SzMainMotorTemperature","SzPrechargeContactor","SzSpeed","TargetDriverMode_HW","TargetGears_HW","TargetSpeed_HW","TargetSteeringAngle_HW","TargetStopCarBrakeGears_HW","TargetSubSpeed_HW","TemperatureDifferenceAlarm","TemptFeelerCntOfFC","TemptOfFC","TerminalCollected24VvoltageValue","TerminalMonitorFault","TerminalPowerOff","TerminalUnderVoltage","TestCleanWaterBox_HW","TgtPowerOfFC","TheftAlarm","ThePostTotalPower","ThePostTotalPowerOfFC","ThePostTotalPowerOfFCUpDCDC","ThePostTotalPowerOfSnd24VDCDC","TheRevrTotalPower","TheRevrTotalPowerOfFC","TheRevrTotalPowerOfFCUpDCDC","TheRevrTotalPowerOfSnd24VDCDC","ThreeWayValveFeedbackVoltage","ThreeWayValveState","ThrottleAccelerate_HW","Time","TimeoutParking","TireAirLeakageRate","TireLocation","TirePressure","TirePressureThresholdDetection","TireTemperature","TotalChrgTime","TotalEnergyConsumption","TotalFireCurrent","TotalGasConsumption","TotalHydConsumption","TotalMileage","TotalOilconsumption","TotalRunTime","TotalVol","TotalWaterValveTesting_HW","TpmsPressureValveTesting","TpmsSerialNumber","TpmsStatus","TpmsTirePosition","TpmsTirePressure","TpmsTireTemperature","TransmissionOutputShaftSpeed","TriangleState","TrolleyLifterCtrl","TrolleyOfflineAlarm","TrolleySourceState","TrueSpeed","TrumpetStatus_HW","TtsModeFault","TurnLightStatus_HW","TyreFastLeakAlarm","TyreHighTmpAlarm","TyreSensorElcQuantityState","UnitDemandPower","UnloadingActionSwitch_HW","UnloadingAction_HW","UnloadingDownSolenoidValve_HW","UnloadingUpSolenoidValve_HW","UnlockMotorOutput","UnlockMotorOutputDiagnosticState","UreaInjectionRate","UreaLevel","UreaLevel_JYD","UreaLiquidLevelLight","UrgentAlarm","user_def_door_state","VehicleActualCurrent","VehicleElcBrakeMaxAbilityPercent","VehicleOneWayUptime","VehicleOutElcTorquePercent","VehiclePowerMode","VehicleReqCurrent","VehicleReqPower","VehicleState","VehicleType","VelBubbleWaterAlarm","Velocity","voc_in_vehicle","VoltageOfFC","VssFault","WarehouseTemperatureAlarm","WarehouseTemptAlarmEx","WarmAlarmStatus","WarmStatus","WasteLocation_HW","WaterCoolingCycleMode","WaterCoolingFanState","WaterCoolingRefrigerationRequest","WaterCoolingRuState","WaterCoolingSolenoidState","WaterCoolingState","WaterCoolingWaterPumpState","WateringStatus_HW","WaterShortageOfMotorCoolant_HW","WaterTankWater_HW","WaterTank_HW","WiFiStopSwitch_HW","WorkingModel_HW","WorkLamp_HW","WorkModeSwitch_HW","XBRSystemState","PTCHeaterControl","HydrogenationHatchState","BMSCurrentVol","ACEvaporatorFanGear","ACTotalPower","DefrostAcTotalPower","DefrostAirOutModeAndCirculateControl","DefrostCompressorActualSpeed","DefrostEvapTemp","DefrostPTCGearControl","Revise_EltricVehicleType_18FF0C24","Revise_EltricVehicleType","Revise_PositiveTotalPower","Revise_ReverseTotalPower","Revise_TotalMileage","Revise_EngineTotalFuelUsed","Revise_BatteryManufacturer","Revise_BatteryType","Revise_IslDCDCOnceDischElecQty","Revise_VehicleState","Revise_MainMotorWorkMode","Revise_GasConsumption_WC","Revise_GasConsumption_ESI","Revise_GasConsumption_ECI","Revise_BatteryCapacitySOC","Revise_TotalGasConsumption","Revise_MVCSGuidLine","Revise_MVCSVelColor","Revise_MVCSViewMode","REVISE_MOTORTOTALOILCONSUMPTION","Revise_PositiveTotalPower18F817D2","Revise_PositiveTotalPower18FF37F4","Revise_ReverseTotalPower18F817D2","Revise_ReverseTotalPower18FF37F4","Revise_MVCSViewSplit"
+    # ]
+    # col = [
+    #     "id","MessageID","sim_no","device_id","device_no","device_vin","device_ln","device_sn","terminal_id","buss","org_id","row_create_time","device_category","old_device_id","real_terminal_id","ABSFaultAlarm","ABSWork","AcceleratorPedalEffectiveSignal","AcceleratorPedalPosition","ACChargingMode","AccState","acc_status","adas_alarm_id","adas_alarm_level","adas_alarm_type","adas_elevation","adas_latitude","adas_longitude","adas_speed","adas_time","AirCondition","AirConditionerCompressorSwitchState","AirConditionerElectricHeatingSwitchState","AirConditioningHeatSwitchState","AirConditioningRefrigerationSwitchState","AirConditioningSystemSwitchState","AirFilterPluggingAlarm","alarm_state","alarm_state_ext_value","alarm_time","Altitude","AnalogQuantity","AreaOrLineDirection","AreaOrLineID","AreaOrLineID_11","AtmosphericPressure","attachments","BackDoorSignal","BackDoorState","BaseStationID","Battery12VLowAlarm","BatteryManagementSystemState","BatteryOverTemperatureAlarm","BatteryOvervoltageAlarm1","BatteryOvervoltageAlarm2","batteryVoltage","BatteryVoltageOvervoltageAlarm","BeidouUsingState","BidirectionalDCDCChargerWorkingState","BidirectionalDCDCWorkingModeState","BleedValveSignal","bl_acc_status","bl_alarm_id","bl_alarm_time","bl_alarm_type","bl_attachments","bl_brake_status","bl_card_status","bl_elevation","bl_latitude","bl_left_turn_status","bl_longitude","bl_position_status","bl_right_turn_status","bl_speed","bl_terminal_code","bl_time","bl_wiper_status","BrakeLightSignal","BrakePressureAlarm","BrakeShoeWearAlarm","brake_status","BrakingSignal","BusAgreementOccupancy","Camera1Failure","Camera2Failure","Camera3Failure","Camera4Failure","CameraFault","CANBusCommunicationFaultWarning","CapacitorManagementSystemState","CardReaderFailure","card_status","CarLockedState_32","CarLockedState_4A","CarToBeLockedState_32","CarToBeLockedState_4A","CartwheelAlarm","CarUnlockedState_32","CarUnlockedState_4A","CellID","ChannelID","CharacteristicCoefficientCorrectionState","ChargeEndTime","ChargeStartTime","CircuitState","ClutchStatus","CollisionAlarm","CommunicationModuleDialingState","ConductorNo","CumulativeDrivingTimeout","CumulativeGasConsumption","CumulativeOilConsumption","DeepHibernationState","deviation_type","device_failure_state_value","device_fault_state_number","DialingStatus","DialupFailureAlert","DistancePercent","DoorLockState","DoorOpenAlarm","DriverAssistantFailure","DriverIDCode","DriverNo","driver_alarm_id","driver_alarm_level","driver_alarm_type","driver_elevation","driver_fatigue","driver_latitude","driver_longitude","driver_speed","driver_time","DrivingRecordSpeed","DrivingSeatDoorState","dr_acc_status","dr_alarm_time","dr_attachments","dr_brake_status","dr_card_status","dr_left_turn_status","dr_position_status","dr_right_turn_status","dr_terminal_code","dr_wiper_status","DVRFailure","DVROnlineStatus","eaton_alarm_info_number","ElectricDefrostSignalEffective","EmergencyAccelerationAlarm","EmergencyDecelerationAlarm","EmergencySwitch","EncryptionState","EngineCANInteractiveNormalState_32","EngineCANInteractiveNormalState_4A","EngineControlMode","EngineCoolantTemperature","EngineHatchSignal","EngineOverturnAlarm","EngineRunTotalTime","EngineShutdownCommand","EngineSpeed","EngineTemperature","EngineTorquePercentage","extended_vehicle_alarm_value","FatigueDrivingAlarm","FatigueDrivingWarning","FogLightSignal","ForcedTrafficSignal","ForwardCollisionWarning","FrontDoorState","FuelBlockageSignal","FuelWarning","GalileoUsingState","GasMass","GearPositionInformation","GlonassUsingState","GnssAntennaDisconnect","GnssAntennaShortCircuit","GnssModuleFault","GPSDirection","GPSDisconnectFault","GPSMileage","GPSModuleFailure","GpsState","GpsUsingState","HandBrakeSignal","HeaterWork","Hibernationstate","HighCoolantTemperatureAlarm","HornSignal","IceAndSnowMode","IdleAirConditioningAlarm","IdleStopSignal","IllegalDisplacement","IllegalIgnition","IllegalOpenDoorAlarm","InletTemperature","InOrOutArea","InOrOutLine","InstantaneousFuelConsumption","InstantaneousGasConsumption","InsulationResistanceLowAlarm","ISGMotorControlMode","ISGMotorRotationDirection","ISGMotorWorkingMode","IsolateDCDCWorkingMode","LaneDepartureWarning","Latitude","LatitudeState","LeftTurnLightSignal","left_turn_status","LithiumBatteryFailure","LoadState","LocationInfoType","LocationType","LocationType_11","LockCarNormalState_32","LockCarNormalState_4A","Longitude","LongitudeState","LowWaterLevelAlarm","MachineFilterPluggingSignal","MainMotorControlMode","MainMotorRotationDirection","ManualConfirmAlarmEventID","MessageTraffic","MiddleDoorState","Mileage","MixedState","ModuleInstallationStatusOf3G","MotorOverTemperatureAlarm","MovingSignal","NearLightSignal","NetworkSignalStrength","NeutralGlideAlarm","NeutralSignal","NotEnoughOrTooLong","NumberOfSatellites","Occupied","OilAbnormal","OilMass","OilPressure","OilPressureAlarm","OilState","OilTemperature","OilTemperatureAlarmSignal","OnGearSignal","OpenDoorFlag","OperatingState","OverlongIdleAlarm","OverspeedAlarm","OverspeedWaring","PassengerCount","PECHeatingEnable","PhotoFailureAlarm","PictureTraffic","position_status","PostStopSignal","pre_car_speed","pre_cp_distance","ProfileLamp","RemoteLightSignal","RetarderHighTemperatureAlarmSignal","RetarderWork","ReverseSignal","RightTurnLightSignal","right_turn_status","RiskWrning","RoadTransportCardFault","road_sign_data","road_sign_type","RouteDeviationAlarm","RouteID","RouteNo","RouteTravelResult","RouteTravelTime","SDCardCapacity","SDCardInstallationStatus","SDCardUsableCapacity","Searchedstarsnumber","SeatBeltsNotTied","SeriousFailure","SignalIntensityOf2G","SignalIntensityOf3G","SIMCardInstallationStatusOf3G","SpeedOfAcquisitionGetOnCAN","SpeedSrcFlag","StartSignal","state_value","StationNo","StorehouseTemperatureAlarmSignal","SubmeterPositioningModuleDisconnectFault","SubsequentDefineInfoLength","TerminalBuiltinBatteryVoltage","TerminalMainPowerOffStatus","TerminalMainPowerUndervoltageStatus","TerminalMonitorFault","TerminalNotPositioned","TerminalPowerOff","TerminalUnderVoltage","terminal_code","TheCommunicationModuleReceivesSignalStrength","TheCommunicationModuleReceivesTheSignalQualityByRSSI","TheftAlarm","Time","TimeoutParking","TripNo","TtsModeFault","TTSModuleFailure","UrgentAlarm","user_def_door_state","VehicleShutdownTime","VehicleSpeedAnomalyAlarm","VehicleStartupTime","VehicleState","VehicleVSSFailure","Velocity","VideoAnomaly","VideoServerLogonFailureAlert","VideoTraffic","VssFault","VSSMileage","wiper_status","WorkingModeOfElectronicFan","WorkingModeOfMainMotor","Revise_Latitude","Revise_Longitude","Revise_GpsState","Revise_Time","Revise_OilPressure","Revise_EngineRunTotalTime","Revise_OilTemperature","Revise_EngineCoolantTemperature","Revise_InletTemperature","Revise_AtmosphericPressure","Revise_OilMass","Revise_Mileage","Revise_CumulativeOilConsumption","Revise_InstantaneousFuelConsumption","Revise_ConductorNo","Revise_RouteNo","Revise_batteryVoltage","Revise_TerminalBuiltinBatteryVoltage","Revise_GasMass"
+    # ]
+    col = [
+        "ID","DEVICE_NO","DEVICE_ID","FAULT_ID","FAULT_CODE_ID","DEVICE_LN","DEVICE_VIN","DEVICE_SN","FAULT_CODE","REPORT_TIME","FAULT_BEGIN_TIME","FAULT_END_TIME","GPS_LATITUDE","GPS_LONGITUDE","ORG_ID","PROTOL_TYPE","TERMINAL_ID","TERMINAL_TIME","ROW_CREATE_TIME","FAULT_272829_MODULE_NUM","CAP_SGL_OV_ALM_MODULE_NUM","SINGLE_CAPACITOR_OVERVOLTAGE_ALARM_MODULE_NUMBER_ARRAY","OCCURRED_272829_FAULT_ALARM_MODULE_NUMBER_ARRAY","real_terminal_id","REPORT_COUNT","TRACE_ID"
+    ]
+    print(len(col))
+    for each in r:
+        x = ''
+        for c in col:
+            if each[c.upper()] is None:
+                v = ''
+            else:
+                v = each[c.upper()]
+            x = x + str(v) + '|'
+
+        print(x)
